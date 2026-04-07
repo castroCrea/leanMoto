@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "LeanRide AI",
+    "slug": "leanride-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0F"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.leanrideai.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "LeanRide AI uses your location to track ride routes and calculate speed.",
+        "NSMotionUsageDescription": "LeanRide AI uses motion sensors to calculate lean angles and G-forces."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0A0A0F"
+      },
+      "package": "com.leanrideai.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "BODY_SENSORS",
+        "WAKE_LOCK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-location",
+      "expo-sensors",
+      "expo-av",
+      ["expo-keep-awake"]
+    ]
+  }
+}
