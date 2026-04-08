@@ -30,6 +30,6 @@ export const HUDScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: '#151617',
   },
 });

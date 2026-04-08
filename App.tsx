@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { initDatabase } from './src/database/database';
 import { AppErrorBoundary } from './src/components/app/AppErrorBoundary';
+import { t } from './src/i18n';
 
 export default function App() {
   const [dbReady, setDbReady] = useState(false);
@@ -19,7 +20,7 @@ export default function App() {
         setDbReady(true);
       } catch (err) {
         console.error('Database initialization failed:', err);
-        setError('Failed to initialize database');
+        setError(t('app.databaseInitFailed'));
         // Still allow app to run - DB operations will fail gracefully
         setDbReady(true);
       }
@@ -30,8 +31,8 @@ export default function App() {
   if (!dbReady) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#00B4FF" />
-        <Text style={styles.loadingText}>Initializing LeanRide AI...</Text>
+        <ActivityIndicator size="large" color="#E4E5E6" />
+        <Text style={styles.loadingText}>{t('app.initializing')}</Text>
       </View>
     );
   }
@@ -39,7 +40,7 @@ export default function App() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
-        <StatusBar style="light" backgroundColor="#0A0A0F" />
+        <StatusBar style="light" backgroundColor="#151617" />
         <AppErrorBoundary context="root-navigation">
           <AppNavigator />
         </AppErrorBoundary>
@@ -51,17 +52,17 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: '#151617',
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: '#151617',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 16,
   },
   loadingText: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 14,
     fontWeight: '600',
     letterSpacing: 0.5,

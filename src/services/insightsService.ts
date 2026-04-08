@@ -1,7 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Ride, RideInsight } from '../types/ride';
+import { AppLanguage } from '../i18n/translations';
+import { t } from '../i18n';
 
-export function generateInsights(ride: Ride): RideInsight[] {
+export function generateInsights(ride: Ride, language?: AppLanguage): RideInsight[] {
   const insights: RideInsight[] = [];
   const now = Date.now();
 
@@ -10,8 +12,8 @@ export function generateInsights(ride: Ride): RideInsight[] {
     insights.push({
       id: uuidv4(),
       type: 'warning',
-      title: 'Aggressive Cornering Detected',
-      description: `You reached a maximum lean angle of ${ride.maxLeanAngle.toFixed(1)}°. Ride within your limits.`,
+      title: t('insights.aggressiveCorneringTitle', undefined, language),
+      description: t('insights.aggressiveCorneringDescription', { value: ride.maxLeanAngle.toFixed(1) }, language),
       value: ride.maxLeanAngle,
       unit: '°',
       timestamp: now,
@@ -23,8 +25,8 @@ export function generateInsights(ride: Ride): RideInsight[] {
     insights.push({
       id: uuidv4(),
       type: 'warning',
-      title: 'High Average Speed',
-      description: `Your average speed was ${ride.avgSpeed.toFixed(1)} km/h. Consider the road conditions.`,
+      title: t('insights.highAverageSpeedTitle', undefined, language),
+      description: t('insights.highAverageSpeedDescription', { value: ride.avgSpeed.toFixed(1) }, language),
       value: ride.avgSpeed,
       unit: 'km/h',
       timestamp: now,
@@ -36,8 +38,8 @@ export function generateInsights(ride: Ride): RideInsight[] {
     insights.push({
       id: uuidv4(),
       type: 'info',
-      title: 'Short Ride',
-      description: `You covered ${ride.distance.toFixed(1)} km. Short rides are great for warm-up or cool-down.`,
+      title: t('insights.shortRideTitle', undefined, language),
+      description: t('insights.shortRideDescription', { value: ride.distance.toFixed(1) }, language),
       value: ride.distance,
       unit: 'km',
       timestamp: now,
@@ -49,8 +51,8 @@ export function generateInsights(ride: Ride): RideInsight[] {
     insights.push({
       id: uuidv4(),
       type: 'warning',
-      title: 'High Risk Ride',
-      description: `Your ride risk score was ${ride.riskScore.toFixed(0)}/100. Focus on smooth, progressive inputs.`,
+      title: t('insights.highRiskRideTitle', undefined, language),
+      description: t('insights.highRiskRideDescription', { value: ride.riskScore.toFixed(0) }, language),
       value: ride.riskScore,
       unit: '/100',
       timestamp: now,
@@ -64,8 +66,12 @@ export function generateInsights(ride: Ride): RideInsight[] {
     insights.push({
       id: uuidv4(),
       type: 'achievement',
-      title: 'Balanced Cornering',
-      description: `Great balance! Left max: ${leftAbs.toFixed(1)}° vs Right max: ${rightAbs.toFixed(1)}°. Consistent technique!`,
+      title: t('insights.balancedCorneringTitle', undefined, language),
+      description: t(
+        'insights.balancedCorneringDescription',
+        { left: leftAbs.toFixed(1), right: rightAbs.toFixed(1) },
+        language,
+      ),
       timestamp: now,
     });
   }
@@ -75,8 +81,8 @@ export function generateInsights(ride: Ride): RideInsight[] {
     insights.push({
       id: uuidv4(),
       type: 'achievement',
-      title: 'Confident Cornering',
-      description: `You hit ${ride.maxLeanAngle.toFixed(1)}° lean angle. You're riding with confidence.`,
+      title: t('insights.confidentCorneringTitle', undefined, language),
+      description: t('insights.confidentCorneringDescription', { value: ride.maxLeanAngle.toFixed(1) }, language),
       value: ride.maxLeanAngle,
       unit: '°',
       timestamp: now,
@@ -88,8 +94,8 @@ export function generateInsights(ride: Ride): RideInsight[] {
     insights.push({
       id: uuidv4(),
       type: 'tip',
-      title: 'Smooth and Steady',
-      description: 'You maintained sensible speeds. Consistency is key to improving cornering technique.',
+      title: t('insights.smoothAndSteadyTitle', undefined, language),
+      description: t('insights.smoothAndSteadyDescription', undefined, language),
       timestamp: now,
     });
   }
@@ -99,8 +105,8 @@ export function generateInsights(ride: Ride): RideInsight[] {
     insights.push({
       id: uuidv4(),
       type: 'achievement',
-      title: 'Century Ride!',
-      description: `You completed ${ride.distance.toFixed(1)} km in one session. Outstanding endurance!`,
+      title: t('insights.centuryRideTitle', undefined, language),
+      description: t('insights.centuryRideDescription', { value: ride.distance.toFixed(1) }, language),
       value: ride.distance,
       unit: 'km',
       timestamp: now,

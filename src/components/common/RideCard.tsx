@@ -7,6 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ride } from '../../types/ride';
 import { formatDuration, formatDistance } from '../../utils/calculations';
+import { useI18n } from '../../i18n';
 
 interface Props {
   ride: Ride;
@@ -16,6 +17,7 @@ interface Props {
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export const RideCard: React.FC<Props> = ({ ride, onPress }) => {
+  const { t, locale } = useI18n();
   const scale = useSharedValue(1);
 
   const animStyle = useAnimatedStyle(() => ({
@@ -23,18 +25,18 @@ export const RideCard: React.FC<Props> = ({ ride, onPress }) => {
   }));
 
   const date = new Date(ride.startTime);
-  const dateStr = date.toLocaleDateString('en-US', {
+  const dateStr = date.toLocaleDateString(locale, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
   });
-  const timeStr = date.toLocaleTimeString('en-US', {
+  const timeStr = date.toLocaleTimeString(locale, {
     hour: '2-digit',
     minute: '2-digit',
   });
 
   const leanColor =
-    ride.maxLeanAngle > 45 ? '#FF3A2F' : ride.maxLeanAngle > 30 ? '#FF8800' : '#00B4FF';
+    ride.maxLeanAngle > 45 ? '#F38BA8' : ride.maxLeanAngle > 30 ? '#F2C27B' : '#E4E5E6';
 
   return (
     <AnimatedPressable
@@ -56,31 +58,31 @@ export const RideCard: React.FC<Props> = ({ ride, onPress }) => {
           <Text style={[styles.leanValue, { color: leanColor }]}>
             {ride.maxLeanAngle.toFixed(0)}°
           </Text>
-          <Text style={styles.leanLabel}>MAX LEAN</Text>
+          <Text style={styles.leanLabel}>{t('rideCard.maxLean')}</Text>
         </View>
       </View>
 
       <View style={styles.statsRow}>
         <View style={styles.stat}>
           <Text style={styles.statValue}>{formatDistance(ride.distance, 'metric')}</Text>
-          <Text style={styles.statLabel}>Distance</Text>
+          <Text style={styles.statLabel}>{t('rideCard.distance')}</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.stat}>
           <Text style={styles.statValue}>{formatDuration(ride.duration)}</Text>
-          <Text style={styles.statLabel}>Duration</Text>
+          <Text style={styles.statLabel}>{t('rideCard.duration')}</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{ride.maxSpeed.toFixed(0)} km/h</Text>
-          <Text style={styles.statLabel}>Top Speed</Text>
+          <Text style={styles.statValue}>{ride.maxSpeed.toFixed(0)} {t('common.metricSpeedUnit')}</Text>
+          <Text style={styles.statLabel}>{t('rideCard.topSpeed')}</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.stat}>
-          <Text style={[styles.statValue, { color: ride.riskScore > 70 ? '#FF3A2F' : '#8899AA' }]}>
+          <Text style={[styles.statValue, { color: ride.riskScore > 70 ? '#F38BA8' : '#8B90A7' }]}>
             {ride.riskScore.toFixed(0)}
           </Text>
-          <Text style={styles.statLabel}>Risk</Text>
+          <Text style={styles.statLabel}>{t('rideCard.risk')}</Text>
         </View>
       </View>
     </AnimatedPressable>
@@ -89,13 +91,13 @@ export const RideCard: React.FC<Props> = ({ ride, onPress }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 16,
     padding: 16,
     marginHorizontal: 16,
     marginVertical: 6,
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
   },
   header: {
     flexDirection: 'row',
@@ -109,7 +111,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   timeText: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 13,
     marginTop: 2,
   },
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
   leanLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
@@ -142,7 +144,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   statLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 10,
     marginTop: 2,
     fontWeight: '500',
@@ -150,6 +152,6 @@ const styles = StyleSheet.create({
   divider: {
     width: 1,
     height: 28,
-    backgroundColor: '#223344',
+    backgroundColor: '#2A2F3D',
   },
 });

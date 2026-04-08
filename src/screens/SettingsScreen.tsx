@@ -16,20 +16,24 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useSettingsStore } from '../store/settingsStore';
 import { deleteRide, getAllRides } from '../database/database';
+import { useI18n } from '../i18n';
 
 type RootStackParamList = {
   Calibration: undefined;
 };
 
 export const SettingsScreen: React.FC = () => {
+  const { t } = useI18n();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {
     unitSystem,
+    language,
     voiceAlertsEnabled,
     highLeanAngleThreshold,
     keepScreenOn,
     hudMode,
     setUnitSystem,
+    setLanguage,
     setVoiceAlertsEnabled,
     setHighLeanAngleThreshold,
     setKeepScreenOn,
@@ -38,12 +42,12 @@ export const SettingsScreen: React.FC = () => {
 
   const handleClearAllData = () => {
     Alert.alert(
-      'Clear All Data',
-      'This will permanently delete all rides and cannot be undone.',
+      t('settings.clearAllDataTitle'),
+      t('settings.clearAllDataMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete All',
+          text: t('settings.deleteAll'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -51,9 +55,9 @@ export const SettingsScreen: React.FC = () => {
               for (const ride of rides) {
                 await deleteRide(ride.id);
               }
-              Alert.alert('Done', 'All ride data has been deleted.');
+              Alert.alert(t('common.done'), t('settings.clearAllDataDone'));
             } catch {
-              Alert.alert('Error', 'Failed to delete all data.');
+              Alert.alert(t('common.error'), t('settings.clearAllDataError'));
             }
           },
         },
@@ -64,16 +68,16 @@ export const SettingsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.pageTitle}>Settings</Text>
+        <Text style={styles.pageTitle}>{t('settings.title')}</Text>
 
         {/* Units section */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>UNITS</Text>
+          <Text style={styles.sectionHeader}>{t('settings.units')}</Text>
           <View style={styles.card}>
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingLabel}>Unit System</Text>
-                <Text style={styles.settingDesc}>Speed and distance units</Text>
+                <Text style={styles.settingLabel}>{t('settings.unitSystem')}</Text>
+                <Text style={styles.settingDesc}>{t('settings.unitSystemDesc')}</Text>
               </View>
               <View style={styles.toggleGroup}>
                 <TouchableOpacity
@@ -113,28 +117,66 @@ export const SettingsScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Voice alerts */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>VOICE ALERTS</Text>
+          <Text style={styles.sectionHeader}>{t('settings.language')}</Text>
           <View style={styles.card}>
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingLabel}>Voice Alerts</Text>
-                <Text style={styles.settingDesc}>Spoken ride updates and warnings</Text>
+                <Text style={styles.settingLabel}>{t('settings.appLanguage')}</Text>
+                <Text style={styles.settingDesc}>{t('settings.appLanguageDesc')}</Text>
+              </View>
+              <View style={styles.toggleGroup}>
+                <TouchableOpacity
+                  style={[styles.toggleButton, language === 'system' && styles.toggleButtonActive]}
+                  onPress={() => setLanguage('system')}
+                >
+                  <Text style={[styles.toggleText, language === 'system' && styles.toggleTextActive]}>
+                    {t('settings.system')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.toggleButton, language === 'en' && styles.toggleButtonActive]}
+                  onPress={() => setLanguage('en')}
+                >
+                  <Text style={[styles.toggleText, language === 'en' && styles.toggleTextActive]}>
+                    {t('settings.english')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.toggleButton, language === 'fr' && styles.toggleButtonActive]}
+                  onPress={() => setLanguage('fr')}
+                >
+                  <Text style={[styles.toggleText, language === 'fr' && styles.toggleTextActive]}>
+                    {t('settings.french')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Voice alerts */}
+        <View style={styles.section}>
+          <Text style={styles.sectionHeader}>{t('settings.voiceAlerts')}</Text>
+          <View style={styles.card}>
+            <View style={styles.settingRow}>
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingLabel}>{t('settings.voiceAlertsLabel')}</Text>
+                <Text style={styles.settingDesc}>{t('settings.voiceAlertsDesc')}</Text>
               </View>
               <Switch
                 value={voiceAlertsEnabled}
                 onValueChange={setVoiceAlertsEnabled}
-                trackColor={{ false: '#334455', true: '#00B4FF44' }}
-                thumbColor={voiceAlertsEnabled ? '#00B4FF' : '#8899AA'}
+                trackColor={{ false: '#353B4D', true: '#E4E5E633' }}
+                thumbColor={voiceAlertsEnabled ? '#E4E5E6' : '#8B90A7'}
               />
             </View>
             {voiceAlertsEnabled && (
               <View style={styles.settingSubRow}>
                 <Text style={styles.settingLabel}>
-                  Alert Threshold: {highLeanAngleThreshold.toFixed(0)}°
+                  {t('settings.alertThreshold', { value: highLeanAngleThreshold.toFixed(0) })}
                 </Text>
-                <Text style={styles.settingDesc}>Alert when lean exceeds this angle</Text>
+                <Text style={styles.settingDesc}>{t('settings.alertThresholdDesc')}</Text>
                 <Slider
                   style={styles.slider}
                   minimumValue={20}
@@ -142,9 +184,9 @@ export const SettingsScreen: React.FC = () => {
                   step={1}
                   value={highLeanAngleThreshold}
                   onValueChange={setHighLeanAngleThreshold}
-                  minimumTrackTintColor="#00B4FF"
-                  maximumTrackTintColor="#334455"
-                  thumbTintColor="#00B4FF"
+                  minimumTrackTintColor="#E4E5E6"
+                  maximumTrackTintColor="#353B4D"
+                  thumbTintColor="#E4E5E6"
                 />
                 <View style={styles.sliderLabels}>
                   <Text style={styles.sliderLabel}>20°</Text>
@@ -157,30 +199,30 @@ export const SettingsScreen: React.FC = () => {
 
         {/* Display */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>DISPLAY</Text>
+          <Text style={styles.sectionHeader}>{t('settings.display')}</Text>
           <View style={styles.card}>
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingLabel}>Keep Screen On</Text>
-                <Text style={styles.settingDesc}>Prevent screen from sleeping during rides</Text>
+                <Text style={styles.settingLabel}>{t('settings.keepScreenOn')}</Text>
+                <Text style={styles.settingDesc}>{t('settings.keepScreenOnDesc')}</Text>
               </View>
               <Switch
                 value={keepScreenOn}
                 onValueChange={setKeepScreenOn}
-                trackColor={{ false: '#334455', true: '#00B4FF44' }}
-                thumbColor={keepScreenOn ? '#00B4FF' : '#8899AA'}
+                trackColor={{ false: '#353B4D', true: '#E4E5E633' }}
+                thumbColor={keepScreenOn ? '#E4E5E6' : '#8B90A7'}
               />
             </View>
             <View style={[styles.settingRow, styles.settingRowBorder]}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingLabel}>HUD Mode</Text>
-                <Text style={styles.settingDesc}>Show minimal heads-up display</Text>
+                <Text style={styles.settingLabel}>{t('settings.hudMode')}</Text>
+                <Text style={styles.settingDesc}>{t('settings.hudModeDesc')}</Text>
               </View>
               <Switch
                 value={hudMode}
                 onValueChange={setHudMode}
-                trackColor={{ false: '#334455', true: '#00B4FF44' }}
-                thumbColor={hudMode ? '#00B4FF' : '#8899AA'}
+                trackColor={{ false: '#353B4D', true: '#E4E5E633' }}
+                thumbColor={hudMode ? '#E4E5E6' : '#8B90A7'}
               />
             </View>
           </View>
@@ -188,44 +230,41 @@ export const SettingsScreen: React.FC = () => {
 
         {/* Calibration */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>SENSORS</Text>
+          <Text style={styles.sectionHeader}>{t('settings.sensors')}</Text>
           <View style={styles.card}>
             <TouchableOpacity
               style={styles.navRow}
               onPress={() => navigation.navigate('Calibration')}
             >
               <View style={styles.settingInfo}>
-                <Text style={styles.settingLabel}>Sensor Calibration</Text>
-                <Text style={styles.settingDesc}>Calibrate lean angle detection</Text>
+                <Text style={styles.settingLabel}>{t('settings.sensorCalibration')}</Text>
+                <Text style={styles.settingDesc}>{t('settings.sensorCalibrationDesc')}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#8899AA" />
+              <Ionicons name="chevron-forward" size={20} color="#8B90A7" />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Data */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>DATA</Text>
+          <Text style={styles.sectionHeader}>{t('settings.data')}</Text>
           <View style={styles.card}>
             <TouchableOpacity style={styles.dangerRow} onPress={handleClearAllData}>
-              <Ionicons name="trash-outline" size={18} color="#FF3A2F" />
-              <Text style={styles.dangerText}>Clear All Ride Data</Text>
+              <Ionicons name="trash-outline" size={18} color="#F38BA8" />
+              <Text style={styles.dangerText}>{t('settings.clearAllRideData')}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* About */}
         <View style={styles.section}>
-          <Text style={styles.sectionHeader}>ABOUT</Text>
+          <Text style={styles.sectionHeader}>{t('settings.about')}</Text>
           <View style={styles.card}>
             <View style={styles.aboutRow}>
               <Text style={styles.settingLabel}>LeanRide AI</Text>
               <Text style={styles.aboutVersion}>v1.0.0</Text>
             </View>
-            <Text style={styles.aboutDesc}>
-              Advanced motorcycle lean angle analysis with real-time telemetry, AI insights,
-              and HUD mode for serious riders.
-            </Text>
+            <Text style={styles.aboutDesc}>{t('settings.aboutDescription')}</Text>
           </View>
         </View>
       </ScrollView>
@@ -236,7 +275,7 @@ export const SettingsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: '#151617',
   },
   content: {
     padding: 16,
@@ -252,7 +291,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionHeader: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 2,
@@ -261,27 +300,28 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   card: {
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
     overflow: 'hidden',
   },
   settingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 10,
     justifyContent: 'space-between',
     padding: 16,
   },
   settingRowBorder: {
     borderTopWidth: 1,
-    borderTopColor: '#223344',
+    borderTopColor: '#2A2F3D',
   },
   settingSubRow: {
     paddingHorizontal: 16,
     paddingBottom: 16,
     borderTopWidth: 1,
-    borderTopColor: '#223344',
+    borderTopColor: '#2A2F3D',
     paddingTop: 12,
   },
   settingInfo: {
@@ -294,13 +334,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   settingDesc: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 12,
     marginTop: 2,
   },
   toggleGroup: {
     flexDirection: 'row',
-    backgroundColor: '#0A0A0F',
+    backgroundColor: '#151617',
     borderRadius: 8,
     padding: 2,
     gap: 2,
@@ -311,15 +351,15 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   toggleButtonActive: {
-    backgroundColor: '#00B4FF',
+    backgroundColor: '#E4E5E6',
   },
   toggleText: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 13,
     fontWeight: '700',
   },
   toggleTextActive: {
-    color: '#FFFFFF',
+    color: '#141516',
   },
   slider: {
     height: 40,
@@ -331,7 +371,7 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
   sliderLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 11,
   },
   navRow: {
@@ -346,7 +386,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   dangerText: {
-    color: '#FF3A2F',
+    color: '#F38BA8',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -358,12 +398,12 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   aboutVersion: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 13,
     fontWeight: '600',
   },
   aboutDesc: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 12,
     lineHeight: 18,
     paddingHorizontal: 16,

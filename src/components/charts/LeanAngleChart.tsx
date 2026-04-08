@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { RidePoint } from '../../types/ride';
+import { useI18n } from '../../i18n';
 
 interface Props {
   points: RidePoint[];
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export const LeanAngleChart: React.FC<Props> = ({ points, height = 200 }) => {
+  const { t } = useI18n();
   const { width } = useWindowDimensions();
   const chartWidth = Math.max(width - 44, 260);
 
@@ -24,7 +26,7 @@ export const LeanAngleChart: React.FC<Props> = ({ points, height = 200 }) => {
     const labels = sampled.map((p, i) => {
       if (i === 0 || i === sampled.length - 1) {
         const elapsed = Math.floor((p.timestamp - points[0].timestamp) / 1000);
-        return `${elapsed}s`;
+        return `${elapsed}${t('common.secondsShort')}`;
       }
       return '';
     });
@@ -34,7 +36,7 @@ export const LeanAngleChart: React.FC<Props> = ({ points, height = 200 }) => {
       datasets: [
         {
           data: sampled.map((p) => p.leanAngle),
-          color: (opacity = 1) => `rgba(0, 180, 255, ${opacity})`,
+          color: (opacity = 1) => `rgba(143, 155, 255, ${opacity})`,
           strokeWidth: 2,
         },
         {
@@ -45,14 +47,14 @@ export const LeanAngleChart: React.FC<Props> = ({ points, height = 200 }) => {
           withDots: false,
         },
       ],
-      legend: ['Lean Angle (°)'],
+      legend: [t('charts.leanLegend')],
     };
-  }, [points]);
+  }, [points, t]);
 
   if (points.length === 0) {
     return (
       <View style={[styles.empty, { height }]}>
-        <Text style={styles.emptyText}>No data available</Text>
+        <Text style={styles.emptyText}>{t('charts.noDataAvailable')}</Text>
       </View>
     );
   }
@@ -64,17 +66,17 @@ export const LeanAngleChart: React.FC<Props> = ({ points, height = 200 }) => {
         width={chartWidth}
         height={height}
         chartConfig={{
-          backgroundColor: '#1A1A2E',
-          backgroundGradientFrom: '#1A1A2E',
-          backgroundGradientTo: '#0A0A1F',
+          backgroundColor: '#141516',
+          backgroundGradientFrom: '#141516',
+          backgroundGradientTo: '#10121B',
           decimalPlaces: 0,
-          color: (opacity = 1) => `rgba(0, 180, 255, ${opacity})`,
-          labelColor: () => '#8899AA',
+          color: (opacity = 1) => `rgba(143, 155, 255, ${opacity})`,
+          labelColor: () => '#8B90A7',
           style: { borderRadius: 12 },
           propsForDots: { r: '0' },
           propsForBackgroundLines: {
             strokeDasharray: '4 4',
-            stroke: '#223344',
+            stroke: '#2A2F3D',
           },
         }}
         bezier
@@ -97,14 +99,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   empty: {
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 2,
   },
   emptyText: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 14,
   },
 });

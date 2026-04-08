@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { t } from '../../i18n';
 
 interface Props {
   children: React.ReactNode;
@@ -25,9 +26,9 @@ export class AppErrorBoundary extends React.Component<Props, State> {
     if (this.state.error) {
       return (
         <View style={styles.container}>
-          <Text style={styles.title}>Something went wrong</Text>
+          <Text style={styles.title}>{t('errorBoundary.title')}</Text>
           <Text style={styles.subtitle}>
-            {this.props.context ? `Context: ${this.props.context}` : 'Context: app'}
+            {t('errorBoundary.context', { context: this.props.context ?? 'app' })}
           </Text>
           <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
             <Text style={styles.errorText}>{this.state.error.message}</Text>
@@ -43,7 +44,7 @@ export class AppErrorBoundary extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: '#151617',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   subtitle: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#151520',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
   },
   panelContent: {
     padding: 16,

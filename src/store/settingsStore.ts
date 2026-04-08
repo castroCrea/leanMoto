@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SettingsStore {
   unitSystem: 'metric' | 'imperial';
+  language: 'system' | 'en' | 'fr';
   voiceAlertsEnabled: boolean;
   highLeanAngleThreshold: number;
   autoStartRecording: boolean;
@@ -14,6 +15,7 @@ interface SettingsStore {
   theme: 'dark';
 
   setUnitSystem: (unit: 'metric' | 'imperial') => void;
+  setLanguage: (language: 'system' | 'en' | 'fr') => void;
   setVoiceAlertsEnabled: (enabled: boolean) => void;
   setHighLeanAngleThreshold: (threshold: number) => void;
   setAutoStartRecording: (auto: boolean) => void;
@@ -28,6 +30,7 @@ export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set) => ({
       unitSystem: 'metric',
+      language: 'system',
       voiceAlertsEnabled: true,
       highLeanAngleThreshold: 45,
       autoStartRecording: false,
@@ -38,6 +41,7 @@ export const useSettingsStore = create<SettingsStore>()(
       theme: 'dark',
 
       setUnitSystem: (unit) => set({ unitSystem: unit }),
+      setLanguage: (language) => set({ language }),
       setVoiceAlertsEnabled: (enabled) => set({ voiceAlertsEnabled: enabled }),
       setHighLeanAngleThreshold: (threshold) => set({ highLeanAngleThreshold: threshold }),
       setAutoStartRecording: (auto) => set({ autoStartRecording: auto }),

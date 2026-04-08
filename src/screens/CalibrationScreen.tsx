@@ -14,8 +14,10 @@ import { useSettingsStore } from '../store/settingsStore';
 import { calculateLeanAngle } from '../services/leanAngleService';
 import { processAccelerometerData } from '../services/sensorService';
 import { CalibrationData } from '../types/sensors';
+import { useI18n } from '../i18n';
 
 export const CalibrationScreen: React.FC = () => {
+  const { t } = useI18n();
   const { accelerometer, isAvailable } = useSensors();
   const { mountAngle, calibrationOffsets, setMountAngle, setCalibrationOffsets, resetCalibration } =
     useSettingsStore();
@@ -60,83 +62,78 @@ export const CalibrationScreen: React.FC = () => {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.pageTitle}>Sensor Calibration</Text>
+        <Text style={styles.pageTitle}>{t('calibration.title')}</Text>
 
         {/* Instructions */}
         <View style={styles.instructionsCard}>
-          <Text style={styles.instructionsTitle}>📱 Phone Placement</Text>
-          <Text style={styles.instructionsText}>
-            1. Mount your phone in the handlebar mount with the screen facing up.{'\n'}
-            2. Place the bike on a level, flat surface.{'\n'}
-            3. Keep the bike upright (not on side stand).{'\n'}
-            4. Press "Calibrate" and hold still for 2 seconds.
-          </Text>
+          <Text style={styles.instructionsTitle}>📱 {t('calibration.phonePlacement')}</Text>
+          <Text style={styles.instructionsText}>{t('calibration.instructions')}</Text>
         </View>
 
         {/* Live sensor readings */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Live Sensor Data</Text>
+          <Text style={styles.sectionTitle}>{t('calibration.liveSensorData')}</Text>
           {!isAvailable && (
             <View style={styles.warningBox}>
-              <Text style={styles.warningText}>⚠ Physical sensors not available</Text>
+              <Text style={styles.warningText}>{t('calibration.sensorsUnavailable')}</Text>
             </View>
           )}
           <View style={styles.sensorGrid}>
             <View style={styles.sensorCard}>
-              <Text style={styles.sensorLabel}>Raw X</Text>
+              <Text style={styles.sensorLabel}>{t('calibration.rawX')}</Text>
               <Text style={styles.sensorValue}>{accelerometer.x.toFixed(3)}</Text>
             </View>
             <View style={styles.sensorCard}>
-              <Text style={styles.sensorLabel}>Raw Y</Text>
+              <Text style={styles.sensorLabel}>{t('calibration.rawY')}</Text>
               <Text style={styles.sensorValue}>{accelerometer.y.toFixed(3)}</Text>
             </View>
             <View style={styles.sensorCard}>
-              <Text style={styles.sensorLabel}>Raw Z</Text>
+              <Text style={styles.sensorLabel}>{t('calibration.rawZ')}</Text>
               <Text style={styles.sensorValue}>{accelerometer.z.toFixed(3)}</Text>
             </View>
           </View>
           <View style={styles.leanPreview}>
-            <Text style={styles.leanPreviewLabel}>Current Lean Angle (with calibration)</Text>
+            <Text style={styles.leanPreviewLabel}>{t('calibration.currentLeanAngle')}</Text>
             <Text
               style={[
                 styles.leanPreviewValue,
                 {
                   color:
                     Math.abs(currentLean) > 45
-                      ? '#FF3A2F'
+                      ? '#F38BA8'
                       : Math.abs(currentLean) > 20
-                      ? '#FF8800'
-                      : '#00B4FF',
+                        ? '#F2C27B'
+                        : '#E4E5E6',
                 },
               ]}
             >
               {currentLean.toFixed(1)}°
             </Text>
             <Text style={styles.leanPreviewDir}>
-              {currentLean < -0.5 ? '◄ LEFT' : currentLean > 0.5 ? 'RIGHT ►' : 'UPRIGHT'}
+              {currentLean < -0.5 ? t('calibration.left') : currentLean > 0.5 ? t('calibration.right') : t('calibration.upright')}
             </Text>
           </View>
         </View>
 
         {/* Current calibration offsets */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Active Calibration Offsets</Text>
+          <Text style={styles.sectionTitle}>{t('calibration.activeOffsets')}</Text>
           <View style={styles.sensorGrid}>
             <View style={styles.sensorCard}>
-              <Text style={styles.sensorLabel}>Offset X</Text>
-              <Text style={[styles.sensorValue, { color: '#FF8800' }]}>
+              <Text style={styles.sensorLabel}>{t('calibration.offsetX')}</Text>
+              <Text style={[styles.sensorValue, { color: '#F2C27B' }]}>
                 {calibrationOffsets.x.toFixed(3)}
               </Text>
             </View>
             <View style={styles.sensorCard}>
-              <Text style={styles.sensorLabel}>Offset Y</Text>
-              <Text style={[styles.sensorValue, { color: '#FF8800' }]}>
+              <Text style={styles.sensorLabel}>{t('calibration.offsetY')}</Text>
+              <Text style={[styles.sensorValue, { color: '#F2C27B' }]}>
                 {calibrationOffsets.y.toFixed(3)}
               </Text>
             </View>
             <View style={styles.sensorCard}>
-              <Text style={styles.sensorLabel}>Offset Z</Text>
-              <Text style={[styles.sensorValue, { color: '#FF8800' }]}>
+              <Text style={styles.sensorLabel}>{t('calibration.offsetZ')}</Text>
+              <Text style={[styles.sensorValue, { color: '#F2C27B' }]}>
                 {calibrationOffsets.z.toFixed(3)}
               </Text>
             </View>
@@ -145,10 +142,8 @@ export const CalibrationScreen: React.FC = () => {
 
         {/* Mount angle slider */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Mount Angle Correction</Text>
-          <Text style={styles.sliderDescription}>
-            If your phone isn't perfectly flat on the mount, adjust this offset to compensate.
-          </Text>
+          <Text style={styles.sectionTitle}>{t('calibration.mountAngleCorrection')}</Text>
+          <Text style={styles.sliderDescription}>{t('calibration.mountAngleDescription')}</Text>
           <View style={styles.sliderRow}>
             <Text style={styles.sliderBound}>-30°</Text>
             <Slider
@@ -158,13 +153,15 @@ export const CalibrationScreen: React.FC = () => {
               step={0.5}
               value={mountAngle}
               onValueChange={setMountAngle}
-              minimumTrackTintColor="#00B4FF"
-              maximumTrackTintColor="#334455"
-              thumbTintColor="#00B4FF"
+              minimumTrackTintColor="#E4E5E6"
+              maximumTrackTintColor="#353B4D"
+              thumbTintColor="#E4E5E6"
             />
             <Text style={styles.sliderBound}>+30°</Text>
           </View>
-          <Text style={styles.sliderCurrentValue}>Current: {mountAngle.toFixed(1)}°</Text>
+          <Text style={styles.sliderCurrentValue}>
+            {t('common.current', { value: `${mountAngle.toFixed(1)}°` })}
+          </Text>
         </View>
 
         {/* Buttons */}
@@ -175,12 +172,12 @@ export const CalibrationScreen: React.FC = () => {
             disabled={isCalibrating}
           >
             <Text style={styles.calibrateButtonText}>
-              {isCalibrating ? '⏳ Calibrating...' : calibrated ? '✓ Calibrated!' : '🎯 Calibrate'}
+              {isCalibrating ? t('calibration.calibrating') : calibrated ? t('calibration.calibrated') : t('calibration.calibrate')}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-            <Text style={styles.resetButtonText}>Reset Calibration</Text>
+            <Text style={styles.resetButtonText}>{t('calibration.resetCalibration')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -191,7 +188,7 @@ export const CalibrationScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: '#151617',
   },
   scroll: {
     flex: 1,
@@ -208,21 +205,21 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   instructionsCard: {
-    backgroundColor: '#00B4FF22',
+    backgroundColor: '#E4E5E622',
     borderRadius: 12,
     padding: 16,
     borderLeftWidth: 3,
-    borderLeftColor: '#00B4FF',
+    borderLeftColor: '#E4E5E6',
     marginBottom: 8,
   },
   instructionsTitle: {
-    color: '#00B4FF',
+    color: '#E4E5E6',
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 8,
   },
   instructionsText: {
-    color: '#AABBCC',
+    color: '#B6BBD0',
     fontSize: 13,
     lineHeight: 20,
   },
@@ -236,13 +233,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   warningBox: {
-    backgroundColor: '#FF3A2F22',
+    backgroundColor: '#F38BA822',
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
   },
   warningText: {
-    color: '#FF3A2F',
+    color: '#F38BA8',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -252,15 +249,15 @@ const styles = StyleSheet.create({
   },
   sensorCard: {
     flex: 1,
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 10,
     padding: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
   },
   sensorLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 10,
     fontWeight: '700',
     marginBottom: 4,
@@ -272,16 +269,16 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   leanPreview: {
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
     marginTop: 12,
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
   },
   leanPreviewLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 11,
     fontWeight: '600',
     letterSpacing: 0.5,
@@ -293,14 +290,14 @@ const styles = StyleSheet.create({
     letterSpacing: -2,
   },
   leanPreviewDir: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 2,
     marginTop: 4,
   },
   sliderDescription: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 13,
     lineHeight: 18,
     marginBottom: 12,
@@ -315,14 +312,14 @@ const styles = StyleSheet.create({
     height: 40,
   },
   sliderBound: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 12,
     fontWeight: '600',
     minWidth: 32,
     textAlign: 'center',
   },
   sliderCurrentValue: {
-    color: '#00B4FF',
+    color: '#E4E5E6',
     fontSize: 14,
     fontWeight: '700',
     textAlign: 'center',
@@ -333,7 +330,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   calibrateButton: {
-    backgroundColor: '#00B4FF',
+    backgroundColor: '#E4E5E6',
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
@@ -348,15 +345,15 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   resetButton: {
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#FF3A2F44',
+    borderColor: '#F38BA833',
   },
   resetButtonText: {
-    color: '#FF3A2F',
+    color: '#F38BA8',
     fontSize: 15,
     fontWeight: '700',
   },

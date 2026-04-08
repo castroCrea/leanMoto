@@ -13,7 +13,7 @@ export const MetricCard: React.FC<Props> = ({
   title,
   value,
   unit,
-  color = '#00B4FF',
+  color = '#E4E5E6',
   size = 'small',
 }) => {
   const isLarge = size === 'large';
@@ -39,13 +39,13 @@ export const MetricCard: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 12,
     padding: 12,
     alignItems: 'center',
     minWidth: 0,
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
   },
   cardLarge: {
     padding: 16,
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   title: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
   },
   unit: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 11,
     fontWeight: '600',
     marginLeft: 3,

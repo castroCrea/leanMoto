@@ -12,8 +12,10 @@ import { LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
 import { useRideHistory } from '../hooks/useRideHistory';
 import { formatDistance, formatDuration } from '../utils/calculations';
+import { useI18n } from '../i18n';
 
 export const AnalyticsScreen: React.FC = () => {
+  const { t, locale } = useI18n();
   const { rides, loading, stats } = useRideHistory();
   const { width } = useWindowDimensions();
   const chartWidth = Math.max(width - 44, 260);
@@ -22,7 +24,7 @@ export const AnalyticsScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#00B4FF" />
+          <ActivityIndicator size="large" color="#E4E5E6" />
         </View>
       </SafeAreaView>
     );
@@ -34,91 +36,91 @@ export const AnalyticsScreen: React.FC = () => {
   const trendData =
     recentRides.length >= 2
       ? {
-          labels: recentRides.map((_, i) => `${i + 1}`),
-          datasets: [
-            {
-              data: recentRides.map((r) => r.maxLeanAngle),
-              color: (opacity = 1) => `rgba(0, 180, 255, ${opacity})`,
-              strokeWidth: 2,
-            },
-          ],
-          legend: ['Max Lean Angle (°)'],
-        }
+        labels: recentRides.map((_, i) => `${i + 1}`),
+        datasets: [
+          {
+            data: recentRides.map((r) => r.maxLeanAngle),
+            color: (opacity = 1) => `rgba(143, 155, 255, ${opacity})`,
+            strokeWidth: 2,
+          },
+        ],
+        legend: [t('charts.maxLeanLegend')],
+      }
       : null;
 
   const speedTrendData =
     recentRides.length >= 2
       ? {
-          labels: recentRides.map((_, i) => `${i + 1}`),
-          datasets: [
-            {
-              data: recentRides.map((r) => r.maxSpeed),
-              color: (opacity = 1) => `rgba(0, 217, 126, ${opacity})`,
-              strokeWidth: 2,
-            },
-          ],
-          legend: ['Max Speed (km/h)'],
-        }
+        labels: recentRides.map((_, i) => `${i + 1}`),
+        datasets: [
+          {
+            data: recentRides.map((r) => r.maxSpeed),
+            color: (opacity = 1) => `rgba(127, 209, 185, ${opacity})`,
+            strokeWidth: 2,
+          },
+        ],
+        legend: [t('charts.speedLegend')],
+      }
       : null;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <Text style={styles.pageTitle}>Analytics</Text>
+        <Text style={styles.pageTitle}>{t('analytics.title')}</Text>
 
         {/* Overall stats */}
         <View style={styles.overallGrid}>
           <View style={styles.bigStatCard}>
-            <Ionicons name="bicycle" size={22} color="#00B4FF" />
+            <Ionicons name="bicycle" size={22} color="#E4E5E6" />
             <Text style={styles.bigStatValue}>{stats.totalRides}</Text>
-            <Text style={styles.bigStatLabel}>Total Rides</Text>
+            <Text style={styles.bigStatLabel}>{t('analytics.totalRides')}</Text>
           </View>
           <View style={styles.bigStatCard}>
-            <Ionicons name="map" size={22} color="#00D97E" />
+            <Ionicons name="map" size={22} color="#7FD1B9" />
             <Text style={styles.bigStatValue}>
               {formatDistance(stats.totalDistance, 'metric')}
             </Text>
-            <Text style={styles.bigStatLabel}>Total Distance</Text>
+            <Text style={styles.bigStatLabel}>{t('analytics.totalDistance')}</Text>
           </View>
           <View style={styles.bigStatCard}>
-            <Ionicons name="time" size={22} color="#FF8800" />
+            <Ionicons name="time" size={22} color="#F2C27B" />
             <Text style={styles.bigStatValue}>
               {formatDuration(stats.totalDuration)}
             </Text>
-            <Text style={styles.bigStatLabel}>Total Time</Text>
+            <Text style={styles.bigStatLabel}>{t('analytics.totalTime')}</Text>
           </View>
         </View>
 
         {/* Personal bests */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Personal Bests</Text>
+          <Text style={styles.sectionTitle}>{t('analytics.personalBests')}</Text>
           <View style={styles.pbRow}>
             <View style={styles.pbCardWrap}>
               <View style={styles.pbCard}>
-              <Ionicons name="trending-up" size={20} color="#00B4FF" />
-              <Text style={[styles.pbValue, { color: '#00B4FF' }]}>
-                {stats.personalBestLeanAngle.toFixed(1)}°
-              </Text>
-              <Text style={styles.pbLabel}>Max Lean</Text>
-            </View>
-            </View>
-            <View style={styles.pbCardWrap}>
-              <View style={styles.pbCard}>
-              <Ionicons name="speedometer" size={20} color="#FF3A2F" />
-              <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.pbValue, styles.pbValueCompact, { color: '#FF3A2F' }]}>
-                {stats.personalBestSpeed.toFixed(0)} km/h
-              </Text>
-              <Text style={styles.pbLabel}>Top Speed</Text>
-            </View>
+                <Ionicons name="trending-up" size={20} color="#E4E5E6" />
+                <Text style={[styles.pbValue, { color: '#E4E5E6' }]}>
+                  {stats.personalBestLeanAngle.toFixed(1)}°
+                </Text>
+                <Text style={styles.pbLabel}>{t('analytics.maxLean')}</Text>
+              </View>
             </View>
             <View style={styles.pbCardWrap}>
               <View style={styles.pbCard}>
-              <Ionicons name="refresh-circle" size={20} color="#8800FF" />
-              <Text style={[styles.pbValue, { color: '#8800FF' }]}>
-                {stats.avgMaxLeanAngle.toFixed(1)}°
-              </Text>
-              <Text style={styles.pbLabel}>Avg Max Lean</Text>
+                <Ionicons name="speedometer" size={20} color="#F38BA8" />
+                <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.pbValue, styles.pbValueCompact, { color: '#F38BA8' }]}>
+                  {stats.personalBestSpeed.toFixed(0)} {t('common.metricSpeedUnit')}
+                </Text>
+                <Text style={styles.pbLabel}>{t('analytics.topSpeed')}</Text>
+              </View>
             </View>
+            <View style={styles.pbCardWrap}>
+              <View style={styles.pbCard}>
+                <Ionicons name="refresh-circle" size={20} color="#B7A6FF" />
+                <Text style={[styles.pbValue, { color: '#B7A6FF' }]}>
+                  {stats.avgMaxLeanAngle.toFixed(1)}°
+                </Text>
+                <Text style={styles.pbLabel}>{t('analytics.avgMaxLean')}</Text>
+              </View>
             </View>
           </View>
         </View>
@@ -126,23 +128,23 @@ export const AnalyticsScreen: React.FC = () => {
         {/* Lean angle trend */}
         {trendData && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Lean Angle Trend (Last {recentRides.length} Rides)</Text>
+            <Text style={styles.sectionTitle}>{t('analytics.leanTrend', { count: recentRides.length })}</Text>
             <LineChart
               data={trendData}
               width={chartWidth}
               height={180}
               chartConfig={{
-                backgroundColor: '#1A1A2E',
-                backgroundGradientFrom: '#1A1A2E',
-                backgroundGradientTo: '#0A0A1F',
+                backgroundColor: '#141516',
+                backgroundGradientFrom: '#141516',
+                backgroundGradientTo: '#10121B',
                 decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(0, 180, 255, ${opacity})`,
-                labelColor: () => '#8899AA',
+                color: (opacity = 1) => `rgba(143, 155, 255, ${opacity})`,
+                labelColor: () => '#8B90A7',
                 style: { borderRadius: 12 },
-                propsForDots: { r: '4', fill: '#00B4FF' },
+                propsForDots: { r: '4', fill: '#E4E5E6' },
                 propsForBackgroundLines: {
                   strokeDasharray: '4 4',
-                  stroke: '#223344',
+                  stroke: '#2A2F3D',
                 },
               }}
               bezier
@@ -156,23 +158,23 @@ export const AnalyticsScreen: React.FC = () => {
         {/* Speed trend */}
         {speedTrendData && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Speed Trend (Last {recentRides.length} Rides)</Text>
+            <Text style={styles.sectionTitle}>{t('analytics.speedTrend', { count: recentRides.length })}</Text>
             <LineChart
               data={speedTrendData}
               width={chartWidth}
               height={160}
               chartConfig={{
-                backgroundColor: '#1A1A2E',
-                backgroundGradientFrom: '#1A1A2E',
-                backgroundGradientTo: '#0A1A12',
+                backgroundColor: '#141516',
+                backgroundGradientFrom: '#141516',
+                backgroundGradientTo: '#11181A',
                 decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(0, 217, 126, ${opacity})`,
-                labelColor: () => '#8899AA',
+                color: (opacity = 1) => `rgba(127, 209, 185, ${opacity})`,
+                labelColor: () => '#8B90A7',
                 style: { borderRadius: 12 },
-                propsForDots: { r: '4', fill: '#00D97E' },
+                propsForDots: { r: '4', fill: '#7FD1B9' },
                 propsForBackgroundLines: {
                   strokeDasharray: '4 4',
-                  stroke: '#223344',
+                  stroke: '#2A2F3D',
                 },
               }}
               bezier
@@ -185,27 +187,27 @@ export const AnalyticsScreen: React.FC = () => {
 
         {rides.length === 0 && (
           <View style={styles.emptyContainer}>
-            <Ionicons name="bar-chart-outline" size={64} color="#334455" />
-            <Text style={styles.emptyTitle}>No data yet</Text>
-            <Text style={styles.emptySubtitle}>Complete some rides to see your analytics.</Text>
+            <Ionicons name="bar-chart-outline" size={64} color="#353B4D" />
+            <Text style={styles.emptyTitle}>{t('analytics.emptyTitle')}</Text>
+            <Text style={styles.emptySubtitle}>{t('analytics.emptySubtitle')}</Text>
           </View>
         )}
 
         {/* Recent rides summary table */}
         {rides.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Recent Rides Summary</Text>
+            <Text style={styles.sectionTitle}>{t('analytics.recentRidesSummary')}</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
-                <Text style={[styles.tableCell, styles.tableHeaderText]}>Date</Text>
-                <Text style={[styles.tableCell, styles.tableHeaderText]}>Lean°</Text>
-                <Text style={[styles.tableCell, styles.tableHeaderText]}>km/h</Text>
-                <Text style={[styles.tableCell, styles.tableHeaderText]}>km</Text>
+                <Text style={[styles.tableCell, styles.tableHeaderText]}>{t('analytics.date')}</Text>
+                <Text style={[styles.tableCell, styles.tableHeaderText]}>{t('analytics.lean')}</Text>
+                <Text style={[styles.tableCell, styles.tableHeaderText]}>{t('common.metricSpeedUnit')}</Text>
+                <Text style={[styles.tableCell, styles.tableHeaderText]}>{t('common.metricDistanceUnit')}</Text>
               </View>
               {rides.slice(0, 10).map((ride) => (
                 <View key={ride.id} style={styles.tableRow}>
                   <Text numberOfLines={1} style={[styles.tableCell, styles.tableValueText]}>
-                    {new Date(ride.startTime).toLocaleDateString('en-US', {
+                    {new Date(ride.startTime).toLocaleDateString(locale, {
                       month: 'short',
                       day: 'numeric',
                     })}
@@ -216,10 +218,10 @@ export const AnalyticsScreen: React.FC = () => {
                       {
                         color:
                           ride.maxLeanAngle > 45
-                            ? '#FF3A2F'
+                            ? '#F38BA8'
                             : ride.maxLeanAngle > 30
-                            ? '#FF8800'
-                            : '#00B4FF',
+                              ? '#F2C27B'
+                              : '#E4E5E6',
                         fontWeight: '700',
                       },
                     ]}
@@ -245,7 +247,7 @@ export const AnalyticsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: '#151617',
   },
   content: {
     paddingBottom: 40,
@@ -271,12 +273,12 @@ const styles = StyleSheet.create({
   },
   bigStatCard: {
     flex: 1,
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 12,
     padding: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
     gap: 4,
   },
   bigStatValue: {
@@ -285,7 +287,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   bigStatLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 10,
     fontWeight: '600',
     textAlign: 'center',
@@ -309,12 +311,12 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   pbCard: {
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 12,
     padding: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
     gap: 4,
   },
   pbValue: {
@@ -328,7 +330,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   pbLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 10,
     fontWeight: '600',
     textAlign: 'center',
@@ -349,40 +351,40 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   emptySubtitle: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 14,
     textAlign: 'center',
   },
   table: {
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
     overflow: 'hidden',
   },
   tableHeader: {
     flexDirection: 'row',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: '#223344',
+    backgroundColor: '#2A2F3D',
   },
   tableRow: {
     flexDirection: 'row',
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: '#223344',
+    borderTopColor: '#2A2F3D',
   },
   tableCell: {
     flex: 1,
     textAlign: 'center',
   },
   tableValueText: {
-    color: '#AABBCC',
+    color: '#B6BBD0',
     fontSize: 12,
   },
   tableHeaderText: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.5,

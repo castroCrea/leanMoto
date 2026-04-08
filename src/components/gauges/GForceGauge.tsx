@@ -29,12 +29,12 @@ export const GForceGauge: React.FC<Props> = ({ gForceX, gForceY, size = 200 }) =
   ];
 
   const totalG = Math.sqrt(safeX * safeX + safeY * safeY);
-  const dotColor = totalG < 0.5 ? '#00D97E' : totalG < 1.0 ? '#00B4FF' : '#FF3A2F';
+  const dotColor = totalG < 0.5 ? '#7FD1B9' : totalG < 1.0 ? '#E4E5E6' : '#F38BA8';
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Svg width={size} height={size}>
-        <Circle cx={cx} cy={cy} r={radius} fill="#1A1A2E" stroke="#223344" strokeWidth={1} />
+        <Circle cx={cx} cy={cy} r={radius} fill="#141516" stroke="#2A2F3D" strokeWidth={1} />
 
         {ringRadii.map(({ r, label }) => (
           <React.Fragment key={label}>
@@ -43,7 +43,7 @@ export const GForceGauge: React.FC<Props> = ({ gForceX, gForceY, size = 200 }) =
               cy={cy}
               r={r}
               fill="none"
-              stroke="#334455"
+              stroke="#353B4D"
               strokeWidth={1}
               strokeDasharray="4 4"
             />
@@ -53,8 +53,8 @@ export const GForceGauge: React.FC<Props> = ({ gForceX, gForceY, size = 200 }) =
           </React.Fragment>
         ))}
 
-        <Line x1={cx - radius} y1={cy} x2={cx + radius} y2={cy} stroke="#334455" strokeWidth={1} />
-        <Line x1={cx} y1={cy - radius} x2={cx} y2={cy + radius} stroke="#334455" strokeWidth={1} />
+        <Line x1={cx - radius} y1={cy} x2={cx + radius} y2={cy} stroke="#353B4D" strokeWidth={1} />
+        <Line x1={cx} y1={cy - radius} x2={cx} y2={cy + radius} stroke="#353B4D" strokeWidth={1} />
 
         <SvgText x={cx + radius - 14} y={cy - 4} fill="#445566" fontSize={size * 0.06}>+X</SvgText>
         <SvgText x={cx - 8} y={cy - radius + 12} fill="#445566" fontSize={size * 0.06}>+Y</SvgText>

@@ -8,10 +8,10 @@ interface Props {
 }
 
 const typeConfig = {
-  info: { color: '#00B4FF', bgColor: '#00B4FF22', icon: 'information-circle' as const },
-  warning: { color: '#FF3A2F', bgColor: '#FF3A2F22', icon: 'warning' as const },
+  info: { color: '#E4E5E6', bgColor: '#E4E5E622', icon: 'information-circle' as const },
+  warning: { color: '#F38BA8', bgColor: '#F38BA822', icon: 'warning' as const },
   achievement: { color: '#FFB800', bgColor: '#FFB80022', icon: 'trophy' as const },
-  tip: { color: '#00D97E', bgColor: '#00D97E22', icon: 'bulb' as const },
+  tip: { color: '#7FD1B9', bgColor: '#7FD1B922', icon: 'bulb' as const },
 };
 
 export const InsightCard: React.FC<Props> = ({ insight }) => {
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   description: {
-    color: '#AABBCC',
+    color: '#B6BBD0',
     fontSize: 13,
     lineHeight: 18,
   },

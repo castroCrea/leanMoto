@@ -19,7 +19,7 @@ export const HUDOverlay: React.FC<Props> = ({
 }) => {
   const isLeft = leanAngle < -0.5;
   const isRight = leanAngle > 0.5;
-  const leanColor = isLeft ? '#00B4FF' : isRight ? '#FF3A2F' : '#8899AA';
+  const leanColor = isLeft ? '#E4E5E6' : isRight ? '#F38BA8' : '#8B90A7';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -27,7 +27,7 @@ export const HUDOverlay: React.FC<Props> = ({
       <View style={styles.topRow}>
         <View style={styles.maxContainer}>
           <Text style={styles.maxLabel}>MAX L</Text>
-          <Text style={[styles.maxValue, { color: '#00B4FF' }]}>
+          <Text style={[styles.maxValue, { color: '#E4E5E6' }]}>
             {Math.abs(maxLeft).toFixed(0)}°
           </Text>
         </View>
@@ -37,7 +37,7 @@ export const HUDOverlay: React.FC<Props> = ({
         </View>
         <View style={styles.maxContainer}>
           <Text style={styles.maxLabel}>MAX R</Text>
-          <Text style={[styles.maxValue, { color: '#FF3A2F' }]}>
+          <Text style={[styles.maxValue, { color: '#F38BA8' }]}>
             {Math.abs(maxRight).toFixed(0)}°
           </Text>
         </View>
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     lineHeight: 72,
   },
   speedUnit: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   maxLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1,
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   exitText: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 2,

@@ -28,10 +28,12 @@ import { MetricCard } from '../components/common/MetricCard';
 import { voiceService } from '../services/voiceService';
 import { formatDuration, formatDistance } from '../utils/calculations';
 import { AppErrorBoundary } from '../components/app/AppErrorBoundary';
+import { useI18n } from '../i18n';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export const DashboardScreen: React.FC = () => {
+  const { t } = useI18n();
   const { isRiding, currentMetrics, startRide, stopRide } = useRideStore();
   const { startTracking, stopTracking, isAvailable } = useRideTracking();
   const { keepScreenOn, voiceAlertsEnabled, highLeanAngleThreshold, unitSystem } =
@@ -92,17 +94,17 @@ export const DashboardScreen: React.FC = () => {
   const leanAngle = currentMetrics.leanAngle;
   const isLeft = leanAngle < -0.5;
   const isRight = leanAngle > 0.5;
-  const leanColor = isLeft ? '#00B4FF' : isRight ? '#FF3A2F' : '#8899AA';
+  const leanColor = isLeft ? '#E4E5E6' : isRight ? '#F38BA8' : '#8B90A7';
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#0A0A0F" />
+      <StatusBar barStyle="light-content" backgroundColor="#151617" />
 
       <AppErrorBoundary context="dashboard-screen">
         <TouchableOpacity
           style={[
             styles.floatingRideButton,
-            { backgroundColor: isRiding ? '#FF3A2F' : '#00B4FF' },
+            { backgroundColor: isRiding ? '#F38BA8' : '#E4E5E6' },
           ]}
           onPress={handleToggleRide}
           activeOpacity={0.85}
@@ -118,17 +120,17 @@ export const DashboardScreen: React.FC = () => {
           {/* Header row */}
           <View style={styles.headerRow}>
             <View style={styles.headerStat}>
-              <Text style={styles.headerLabel}>TIME</Text>
+              <Text style={styles.headerLabel}>{t('dashboard.time')}</Text>
               <Text style={styles.headerValue}>
                 {formatDuration(currentMetrics.elapsedTime)}
               </Text>
             </View>
             <View style={styles.statusDot}>
-              <View style={[styles.dot, { backgroundColor: isRiding ? '#00D97E' : '#8899AA' }]} />
-              <Text style={styles.statusText}>{isRiding ? 'RIDING' : 'IDLE'}</Text>
+              <View style={[styles.dot, { backgroundColor: isRiding ? '#7FD1B9' : '#8B90A7' }]} />
+              <Text style={styles.statusText}>{isRiding ? t('dashboard.riding') : t('dashboard.idle')}</Text>
             </View>
             <View style={styles.headerStat}>
-              <Text style={styles.headerLabel}>DIST</Text>
+              <Text style={styles.headerLabel}>{t('dashboard.distance')}</Text>
               <Text style={styles.headerValue}>
                 {formatDistance(currentMetrics.distance, unitSystem)}
               </Text>
@@ -138,7 +140,7 @@ export const DashboardScreen: React.FC = () => {
           {/* Sensor status */}
           {!isAvailable && (
             <View style={styles.sensorWarning}>
-              <Text style={styles.sensorWarningText}>Sensors unavailable - simulation mode</Text>
+              <Text style={styles.sensorWarningText}>{t('dashboard.sensorsUnavailable')}</Text>
             </View>
           )}
 
@@ -171,37 +173,37 @@ export const DashboardScreen: React.FC = () => {
           <View style={styles.metricsRow}>
             <View style={styles.metricCardItem}>
               <MetricCard
-                title="SPEED"
+                title={t('dashboard.speed')}
                 value={currentMetrics.speed}
                 unit={unitSystem === 'imperial' ? 'mph' : 'km/h'}
-                color="#00D97E"
+                color="#7FD1B9"
                 size="small"
               />
             </View>
             <View style={styles.metricCardItem}>
               <MetricCard
-                title="G-FORCE"
+                title={t('dashboard.gForce')}
                 value={currentMetrics.gForce}
                 unit="G"
-                color="#FF8800"
+                color="#F2C27B"
                 size="small"
               />
             </View>
             <View style={styles.metricCardItem}>
               <MetricCard
-                title="MAX LEAN"
+                title={t('dashboard.maxLean')}
                 value={currentMetrics.maxLeanAngleSession}
                 unit="deg"
-                color="#00B4FF"
+                color="#E4E5E6"
                 size="small"
               />
             </View>
             <View style={styles.metricCardItem}>
               <MetricCard
-                title="MAX SPEED"
+                title={t('dashboard.maxSpeed')}
                 value={currentMetrics.maxSpeedSession}
                 unit={unitSystem === 'imperial' ? 'mph' : 'km/h'}
-                color="#8800FF"
+                color="#B7A6FF"
                 size="small"
               />
             </View>
@@ -210,15 +212,15 @@ export const DashboardScreen: React.FC = () => {
           {/* L/R max lean row */}
           <View style={styles.lrRow}>
             <View style={styles.lrCard}>
-              <Text style={styles.lrLabel}>◄ MAX LEFT</Text>
-              <Text style={[styles.lrValue, { color: '#00B4FF' }]}>
+              <Text style={styles.lrLabel}>{t('dashboard.maxLeft')}</Text>
+              <Text style={[styles.lrValue, { color: '#E4E5E6' }]}>
                 {Math.abs(currentMetrics.leftMaxAngle).toFixed(1)}°
               </Text>
             </View>
             <View style={styles.lrDivider} />
             <View style={styles.lrCard}>
-              <Text style={styles.lrLabel}>MAX RIGHT ►</Text>
-              <Text style={[styles.lrValue, { color: '#FF3A2F' }]}>
+              <Text style={styles.lrLabel}>{t('dashboard.maxRight')}</Text>
+              <Text style={[styles.lrValue, { color: '#F38BA8' }]}>
                 {Math.abs(currentMetrics.rightMaxAngle).toFixed(1)}°
               </Text>
             </View>
@@ -230,13 +232,13 @@ export const DashboardScreen: React.FC = () => {
               <TouchableOpacity
                 style={[
                   styles.rideButton,
-                  { backgroundColor: isRiding ? '#FF3A2F' : '#00B4FF' },
+                  { backgroundColor: isRiding ? '#F38BA8' : '#E4E5E6' },
                 ]}
                 onPress={handleToggleRide}
                 activeOpacity={0.85}
               >
                 <Text style={styles.rideButtonText}>
-                  {isRiding ? '■  STOP RIDE' : '▶  START RIDE'}
+                  {isRiding ? t('dashboard.stopRide') : t('dashboard.startRide')}
                 </Text>
               </TouchableOpacity>
             </Animated.View>
@@ -250,7 +252,7 @@ export const DashboardScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: '#151617',
   },
   scroll: {
     flex: 1,
@@ -275,7 +277,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   floatingRideButtonIcon: {
-    color: '#FFFFFF',
+    color: '#141516',
     fontSize: 22,
     fontWeight: '900',
     marginLeft: 1,
@@ -293,7 +295,7 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   headerLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,
@@ -315,20 +317,20 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusText: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 2,
   },
   sensorWarning: {
-    backgroundColor: '#FF3A2F22',
+    backgroundColor: '#F38BA822',
     borderRadius: 8,
     marginHorizontal: 16,
     padding: 8,
     marginBottom: 8,
   },
   sensorWarningText: {
-    color: '#FF3A2F',
+    color: '#F38BA8',
     fontSize: 12,
     textAlign: 'center',
     fontWeight: '600',
@@ -356,11 +358,11 @@ const styles = StyleSheet.create({
   lrRow: {
     flexDirection: 'row',
     marginHorizontal: 16,
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
     marginVertical: 8,
   },
   lrCard: {
@@ -369,7 +371,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   lrLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
@@ -382,7 +384,7 @@ const styles = StyleSheet.create({
   },
   lrDivider: {
     width: 1,
-    backgroundColor: '#223344',
+    backgroundColor: '#2A2F3D',
   },
   buttonContainer: {
     paddingHorizontal: 24,
@@ -398,7 +400,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   rideButtonText: {
-    color: '#FFFFFF',
+    color: '#141516',
     fontSize: 18,
     fontWeight: '900',
     letterSpacing: 3,

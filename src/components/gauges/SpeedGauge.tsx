@@ -35,7 +35,7 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
   const speedToAngle = (s: number) =>
     ARC_START + (Math.min(Math.max(s, 0), MAX_KMH) / MAX_KMH) * (ARC_END - ARC_START);
 
-  const speedColor = safeSpeed < 60 ? '#00D97E' : safeSpeed < 120 ? '#00B4FF' : '#FF3A2F';
+  const speedColor = safeSpeed < 60 ? '#7FD1B9' : safeSpeed < 120 ? '#E4E5E6' : '#F38BA8';
   const activeArcPath = describeArc(cx, cy, arcR, ARC_START, speedToAngle(safeSpeed));
   const ticks = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200];
 
@@ -44,7 +44,7 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
       <Svg width={size} height={size}>
         <Path
           d={describeArc(cx, cy, arcR, ARC_START, ARC_END)}
-          stroke="#1A1A2E"
+          stroke="#141516"
           strokeWidth={size * 0.06}
           fill="none"
           strokeLinecap="round"
@@ -70,7 +70,7 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
               y1={cy + r1 * Math.sin(rad)}
               x2={cx + r2 * Math.cos(rad)}
               y2={cy + r2 * Math.sin(rad)}
-              stroke={major ? '#8899AA' : '#44556688'}
+              stroke={major ? '#8B90A7' : '#4A516680'}
               strokeWidth={major ? 2 : 1}
             />
           );
@@ -87,7 +87,7 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
               y1={cy + r1 * Math.sin(rad)}
               x2={cx + r2 * Math.cos(rad)}
               y2={cy + r2 * Math.sin(rad)}
-              stroke="#FF8800"
+              stroke="#F2C27B"
               strokeWidth={2}
             />
           );
@@ -103,7 +103,7 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
               key={tick}
               x={cx + labelR * Math.cos(rad)}
               y={cy + labelR * Math.sin(rad) + 4}
-              fill="#8899AA"
+              fill="#8B90A7"
               fontSize={size * 0.05}
               textAnchor="middle"
             >
@@ -125,7 +125,7 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
         <SvgText
           x={cx}
           y={cy + size * 0.14}
-          fill="#8899AA"
+          fill="#8B90A7"
           fontSize={size * 0.06}
           textAnchor="middle"
         >

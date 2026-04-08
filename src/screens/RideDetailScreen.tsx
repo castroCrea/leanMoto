@@ -20,12 +20,14 @@ import { MetricCard } from '../components/common/MetricCard';
 import { generateInsights } from '../services/insightsService';
 import { shareRide } from '../utils/export';
 import { formatDuration, formatDistance } from '../utils/calculations';
+import { useI18n } from '../i18n';
 
 type RouteParams = {
   RideDetail: { rideId: string };
 };
 
 export const RideDetailScreen: React.FC = () => {
+  const { t, locale, resolvedLanguage } = useI18n();
   const route = useRoute<RouteProp<RouteParams, 'RideDetail'>>();
   const navigation = useNavigation();
   const { rideId } = route.params;
@@ -44,7 +46,7 @@ export const RideDetailScreen: React.FC = () => {
         ]);
         if (rideData) {
           setRide(rideData);
-          setInsights(generateInsights(rideData));
+          setInsights(generateInsights(rideData, resolvedLanguage));
         }
         setPoints(ridePoints);
       } catch (error) {
@@ -61,7 +63,7 @@ export const RideDetailScreen: React.FC = () => {
     try {
       await shareRide(ride, points);
     } catch {
-      Alert.alert('Export Failed', 'Could not share ride data.');
+      Alert.alert(t('rideDetail.exportFailedTitle'), t('rideDetail.exportFailedMessage'));
     }
   };
 
@@ -69,7 +71,7 @@ export const RideDetailScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#00B4FF" />
+          <ActivityIndicator size="large" color="#E4E5E6" />
         </View>
       </SafeAreaView>
     );
@@ -79,9 +81,9 @@ export const RideDetailScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Ride not found</Text>
+          <Text style={styles.errorText}>{t('rideDetail.notFound')}</Text>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.backLink}>Go Back</Text>
+            <Text style={styles.backLink}>{t('rideDetail.goBack')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -89,7 +91,7 @@ export const RideDetailScreen: React.FC = () => {
   }
 
   const date = new Date(ride.startTime);
-  const dateStr = date.toLocaleDateString('en-US', {
+  const dateStr = date.toLocaleDateString(locale, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -97,7 +99,7 @@ export const RideDetailScreen: React.FC = () => {
   });
 
   const riskColor =
-    ride.riskScore < 30 ? '#00D97E' : ride.riskScore < 60 ? '#FF8800' : '#FF3A2F';
+    ride.riskScore < 30 ? '#7FD1B9' : ride.riskScore < 60 ? '#F2C27B' : '#F38BA8';
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -105,16 +107,16 @@ export const RideDetailScreen: React.FC = () => {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={24} color="#00B4FF" />
+            <Ionicons name="chevron-back" size={24} color="#E4E5E6" />
           </TouchableOpacity>
           <View style={styles.headerContent}>
             <Text style={styles.dateText}>{dateStr}</Text>
             <Text style={styles.timeText}>
-              {date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+              {date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
             </Text>
           </View>
           <TouchableOpacity onPress={handleExport} style={styles.exportButton}>
-            <Ionicons name="share-outline" size={22} color="#00B4FF" />
+            <Ionicons name="share-outline" size={22} color="#E4E5E6" />
           </TouchableOpacity>
         </View>
 
@@ -122,35 +124,35 @@ export const RideDetailScreen: React.FC = () => {
         <View style={styles.statsGrid}>
           <View style={styles.statsGridItem}>
             <MetricCard
-              title="DISTANCE"
+              title={t('rideDetail.distance')}
               value={formatDistance(ride.distance, 'metric')}
-              color="#00D97E"
+              color="#7FD1B9"
               size="large"
             />
           </View>
           <View style={styles.statsGridItem}>
             <MetricCard
-              title="DURATION"
+              title={t('rideDetail.duration')}
               value={formatDuration(ride.duration)}
-              color="#00B4FF"
+              color="#E4E5E6"
               size="large"
             />
           </View>
           <View style={styles.statsGridItem}>
             <MetricCard
-              title="AVG SPEED"
+              title={t('rideDetail.avgSpeed')}
               value={ride.avgSpeed}
               unit="km/h"
-              color="#8800FF"
+              color="#B7A6FF"
               size="large"
             />
           </View>
           <View style={styles.statsGridItem}>
             <MetricCard
-              title="TOP SPEED"
+              title={t('rideDetail.topSpeed')}
               value={ride.maxSpeed}
               unit="km/h"
-              color="#FF8800"
+              color="#F2C27B"
               size="large"
             />
           </View>
@@ -158,23 +160,23 @@ export const RideDetailScreen: React.FC = () => {
 
         {/* Lean angles */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Lean Angles</Text>
+          <Text style={styles.sectionTitle}>{t('rideDetail.leanAngles')}</Text>
           <View style={styles.leanRow}>
             <View style={styles.leanCard}>
-              <Text style={styles.leanLabel}>◄ MAX LEFT</Text>
-              <Text style={[styles.leanValue, { color: '#00B4FF' }]}>
+              <Text style={styles.leanLabel}>{t('rideDetail.maxLeft')}</Text>
+              <Text style={[styles.leanValue, { color: '#E4E5E6' }]}>
                 {Math.abs(ride.leftMaxAngle).toFixed(1)}°
               </Text>
             </View>
             <View style={styles.leanCenter}>
-              <Text style={styles.leanCenterLabel}>PEAK</Text>
+              <Text style={styles.leanCenterLabel}>{t('rideDetail.peak')}</Text>
               <Text style={[styles.leanCenterValue, { color: '#FFFFFF' }]}>
                 {ride.maxLeanAngle.toFixed(1)}°
               </Text>
             </View>
             <View style={styles.leanCard}>
-              <Text style={styles.leanLabel}>MAX RIGHT ►</Text>
-              <Text style={[styles.leanValue, { color: '#FF3A2F' }]}>
+              <Text style={styles.leanLabel}>{t('rideDetail.maxRight')}</Text>
+              <Text style={[styles.leanValue, { color: '#F38BA8' }]}>
                 {Math.abs(ride.rightMaxAngle).toFixed(1)}°
               </Text>
             </View>
@@ -183,23 +185,23 @@ export const RideDetailScreen: React.FC = () => {
 
         {/* Risk score */}
         <View style={styles.riskContainer}>
-          <Text style={styles.sectionTitle}>Risk Score</Text>
+          <Text style={styles.sectionTitle}>{t('rideDetail.riskScore')}</Text>
           <View style={styles.riskBar}>
             <View style={[styles.riskFill, { width: `${ride.riskScore}%`, backgroundColor: riskColor }]} />
           </View>
           <View style={styles.riskLabelRow}>
-            <Text style={styles.riskLabel}>Low Risk</Text>
+            <Text style={styles.riskLabel}>{t('rideDetail.lowRisk')}</Text>
             <Text style={[styles.riskScore, { color: riskColor }]}>
               {ride.riskScore.toFixed(0)}/100
             </Text>
-            <Text style={styles.riskLabel}>High Risk</Text>
+            <Text style={styles.riskLabel}>{t('rideDetail.highRisk')}</Text>
           </View>
         </View>
 
         {/* Lean angle chart */}
         {points.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Lean Angle Over Time</Text>
+            <Text style={styles.sectionTitle}>{t('rideDetail.leanAngleOverTime')}</Text>
             <LeanAngleChart points={points} height={180} />
           </View>
         )}
@@ -207,7 +209,7 @@ export const RideDetailScreen: React.FC = () => {
         {/* Speed chart */}
         {points.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Speed Over Time</Text>
+            <Text style={styles.sectionTitle}>{t('rideDetail.speedOverTime')}</Text>
             <SpeedChart points={points} height={160} />
           </View>
         )}
@@ -215,7 +217,7 @@ export const RideDetailScreen: React.FC = () => {
         {/* Insights */}
         {insights.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Ride Insights</Text>
+            <Text style={styles.sectionTitle}>{t('rideDetail.rideInsights')}</Text>
             {insights.map((insight) => (
               <InsightCard key={insight.id} insight={insight} />
             ))}
@@ -229,7 +231,7 @@ export const RideDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: '#151617',
   },
   content: {
     paddingBottom: 40,
@@ -246,11 +248,11 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   errorText: {
-    color: '#FF3A2F',
+    color: '#F38BA8',
     fontSize: 18,
   },
   backLink: {
-    color: '#00B4FF',
+    color: '#E4E5E6',
     fontSize: 16,
     fontWeight: '700',
   },
@@ -274,7 +276,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   timeText: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 13,
     marginTop: 2,
   },
@@ -303,10 +305,10 @@ const styles = StyleSheet.create({
   },
   leanRow: {
     flexDirection: 'row',
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
     overflow: 'hidden',
   },
   leanCard: {
@@ -315,7 +317,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   leanLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.5,
@@ -329,13 +331,13 @@ const styles = StyleSheet.create({
   leanCenter: {
     borderLeftWidth: 1,
     borderRightWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
     paddingVertical: 16,
     paddingHorizontal: 20,
     alignItems: 'center',
   },
   leanCenterLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
@@ -351,11 +353,11 @@ const styles = StyleSheet.create({
   },
   riskBar: {
     height: 8,
-    backgroundColor: '#1A1A2E',
+    backgroundColor: '#141516',
     borderRadius: 4,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#223344',
+    borderColor: '#2A2F3D',
   },
   riskFill: {
     height: '100%',
@@ -368,7 +370,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   riskLabel: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 11,
   },
   riskScore: {

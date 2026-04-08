@@ -3,11 +3,11 @@ import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle, G, Line, Rect, Text as SvgText } from 'react-native-svg';
 
 const COLORS = {
-  left: '#00B4FF',
-  right: '#FF3A2F',
-  neutral: '#8899AA',
-  track: '#1A1A2E',
-  trackBorder: '#223344',
+  left: '#E4E5E6',
+  right: '#F38BA8',
+  neutral: '#8B90A7',
+  track: '#141516',
+  trackBorder: '#2A2F3D',
   text: '#FFFFFF',
 };
 
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     letterSpacing: -2,
   },
   labelText: {
-    color: '#8899AA',
+    color: '#8B90A7',
     fontSize: 14,
     fontWeight: '700',
     textTransform: 'uppercase',
