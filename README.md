@@ -23,16 +23,16 @@ A React Native (Expo) app for motorcyclists that delivers real-time lean angle t
 
 | Layer | Technology |
 |---|---|
-| Framework | [Expo](https://expo.dev) ~50 / React Native 0.73 |
+| Framework | [Expo](https://expo.dev) SDK 55 / React Native 0.83 |
 | Language | TypeScript 5 |
 | Navigation | React Navigation 6 (bottom tabs + stack) |
 | State | [Zustand](https://github.com/pmndrs/zustand) 4 |
-| Persistence | `expo-sqlite` (rides) · `react-native-mmkv` (settings) |
+| Persistence | `expo-sqlite` (rides) · `@react-native-async-storage/async-storage` (settings) |
 | Sensors | `expo-sensors` (accelerometer / gyroscope) |
 | Location | `expo-location` (GPS speed & route) |
 | Charts | `react-native-chart-kit` · `react-native-svg` |
 | Audio | `expo-av` · `expo-speech` |
-| Animations | `react-native-reanimated` 3 |
+| Animations | `react-native-reanimated` 4 |
 
 ---
 
@@ -100,6 +100,70 @@ Scan the QR code with the **Expo Go** app on your phone, or press `i` / `a` in t
 | Location (when in use) | GPS speed and route tracking |
 | Motion / Body Sensors | Lean angle and G-force calculation |
 | Wake Lock (Android) | Keep screen on during rides |
+
+---
+
+## iOS App Store Release
+
+This project is configured for Expo Application Services (EAS).
+
+### One-time setup
+
+1. Install EAS CLI:
+
+```bash
+npm install -g eas-cli
+```
+
+2. Log in:
+
+```bash
+eas login
+```
+
+3. Create the app in App Store Connect with:
+- Name: `LeanRide AI`
+- Bundle ID: `com.leanrideai.app`
+- SKU: `com.leanrideai.app`
+
+4. Update [eas.json](./eas.json):
+- replace `appleId` with your Apple Developer account email
+- replace `ascAppId` with the App Store Connect app ID once the app exists
+
+### Build for iOS App Store
+
+```bash
+npm run eas:build:ios
+```
+
+This uses the `production` EAS profile and builds an App Store binary with auto-incremented iOS build numbers.
+
+### Submit to App Store Connect
+
+```bash
+npm run eas:submit:ios
+```
+
+Or build and submit in one step:
+
+```bash
+npm run eas:build-submit:ios
+```
+
+### Before submitting
+
+- Verify `ios.bundleIdentifier` in [app.json](./app.json) is still `com.leanrideai.app`
+- Verify the app icon and splash are final
+- Verify `expo.version` is correct
+- Test the build on a real iPhone
+- Check location and motion permission copy in `ios.infoPlist`
+
+### After upload
+
+- Wait for Apple processing in App Store Connect / TestFlight
+- Assign the build to a version
+- Fill in screenshots, privacy, review notes, pricing, and distribution
+- Submit for review
 
 ---
 
