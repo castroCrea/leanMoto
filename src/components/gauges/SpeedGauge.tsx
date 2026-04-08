@@ -1,12 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
-import Animated, { useSharedValue, useAnimatedProps, withTiming, Easing } from 'react-native-reanimated';
-
-const AnimatedPath = Animated.createAnimatedComponent(Path);
+import Svg, { Path, Line, Text as SvgText } from 'react-native-svg';
 
 interface Props {
-  speed: number; // km/h
+  speed: number;
   maxSpeed?: number;
   unit?: 'metric' | 'imperial';
   size?: number;
@@ -32,35 +29,19 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
   const cx = size / 2;
   const cy = size / 2;
   const arcR = size * 0.4;
-  const displaySpeed = unit === 'imperial' ? speed * 0.621371 : speed;
-  const displayMax = unit === 'imperial' ? 124 : 200;
+  const safeSpeed = Number.isFinite(speed) ? Math.max(0, speed) : 0;
+  const displaySpeed = unit === 'imperial' ? safeSpeed * 0.621371 : safeSpeed;
 
   const speedToAngle = (s: number) =>
-    ARC_START + (Math.min(s, MAX_KMH) / MAX_KMH) * (ARC_END - ARC_START);
+    ARC_START + (Math.min(Math.max(s, 0), MAX_KMH) / MAX_KMH) * (ARC_END - ARC_START);
 
-  const speedColor =
-    speed < 60 ? '#00D97E' : speed < 120 ? '#00B4FF' : '#FF3A2F';
-
-  const fillAngle = useSharedValue(ARC_START);
-
-  useEffect(() => {
-    fillAngle.value = withTiming(speedToAngle(speed), {
-      duration: 150,
-      easing: Easing.out(Easing.quad),
-    });
-  }, [speed]);
-
-  const animatedArcProps = useAnimatedProps(() => {
-    const d = describeArc(cx, cy, arcR, ARC_START, fillAngle.value);
-    return { d };
-  });
-
+  const speedColor = safeSpeed < 60 ? '#00D97E' : safeSpeed < 120 ? '#00B4FF' : '#FF3A2F';
+  const activeArcPath = describeArc(cx, cy, arcR, ARC_START, speedToAngle(safeSpeed));
   const ticks = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200];
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Svg width={size} height={size}>
-        {/* Track */}
         <Path
           d={describeArc(cx, cy, arcR, ARC_START, ARC_END)}
           stroke="#1A1A2E"
@@ -68,26 +49,23 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
           fill="none"
           strokeLinecap="round"
         />
-
-        {/* Active speed arc */}
-        <AnimatedPath
+        <Path
+          d={activeArcPath}
           stroke={speedColor}
           strokeWidth={size * 0.06}
           fill="none"
           strokeLinecap="round"
-          animatedProps={animatedArcProps}
         />
 
-        {/* Ticks */}
-        {ticks.map((t) => {
-          const angle = speedToAngle(t);
+        {ticks.map((tick) => {
+          const angle = speedToAngle(tick);
           const rad = ((angle - 90) * Math.PI) / 180;
-          const major = t % 40 === 0;
+          const major = tick % 40 === 0;
           const r1 = arcR - size * 0.055;
           const r2 = arcR - size * (major ? 0.12 : 0.085);
           return (
             <Line
-              key={t}
+              key={tick}
               x1={cx + r1 * Math.cos(rad)}
               y1={cy + r1 * Math.sin(rad)}
               x2={cx + r2 * Math.cos(rad)}
@@ -98,7 +76,6 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
           );
         })}
 
-        {/* Max speed needle */}
         {maxSpeed !== undefined && maxSpeed > 0 && (() => {
           const angle = speedToAngle(maxSpeed);
           const rad = ((angle - 90) * Math.PI) / 180;
@@ -116,15 +93,14 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
           );
         })()}
 
-        {/* Speed labels */}
-        {[0, 60, 120, 200].map((t) => {
-          const angle = speedToAngle(t);
+        {[0, 60, 120, 200].map((tick) => {
+          const angle = speedToAngle(tick);
           const labelR = arcR - size * 0.16;
           const rad = ((angle - 90) * Math.PI) / 180;
-          const label = unit === 'imperial' ? Math.round(t * 0.621371) : t;
+          const label = unit === 'imperial' ? Math.round(tick * 0.621371) : tick;
           return (
             <SvgText
-              key={t}
+              key={tick}
               x={cx + labelR * Math.cos(rad)}
               y={cy + labelR * Math.sin(rad) + 4}
               fill="#8899AA"
@@ -136,7 +112,6 @@ export const SpeedGauge: React.FC<Props> = ({ speed, maxSpeed, unit = 'metric', 
           );
         })}
 
-        {/* Center speed display */}
         <SvgText
           x={cx}
           y={cy + size * 0.05}

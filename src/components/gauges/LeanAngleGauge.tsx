@@ -1,26 +1,16 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
-import Animated, {
-  useSharedValue,
-  useAnimatedProps,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
-
-const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 const COLORS = {
-  background: '#0A0A0F',
   left: '#00B4FF',
   right: '#FF3A2F',
   neutral: '#8899AA',
   card: '#1A1A2E',
-  text: '#FFFFFF',
 };
 
 interface Props {
-  leanAngle: number; // degrees, negative=left, positive=right
+  leanAngle: number;
   maxLeft?: number;
   maxRight?: number;
   size?: number;
@@ -52,65 +42,40 @@ export const LeanAngleGauge: React.FC<Props> = ({
   const outerR = size * 0.42;
   const innerR = size * 0.34;
   const needleR = size * 0.38;
-
-  // Gauge spans from -60 (left, visual left) to +60 (right, visual right)
-  // Mapped to screen angles: -60deg lean → 210° screen, 0 → 270°, +60 → 330°
-  const MIN_LEAN = -60;
-  const MAX_LEAN = 60;
-  const ARC_START = 210; // screen angle for -60
-  const ARC_END = 330;   // screen angle for +60
+  const minLean = -60;
+  const maxLean = 60;
+  const arcStart = 210;
+  const arcEnd = 330;
 
   const leanToAngle = (lean: number) =>
-    ARC_START + ((lean - MIN_LEAN) / (MAX_LEAN - MIN_LEAN)) * (ARC_END - ARC_START);
+    arcStart + ((lean - minLean) / (maxLean - minLean)) * (arcEnd - arcStart);
 
-  const clampedLean = Math.max(MIN_LEAN, Math.min(MAX_LEAN, leanAngle));
+  const safeLean = Number.isFinite(leanAngle) ? leanAngle : 0;
+  const clampedLean = Math.max(minLean, Math.min(maxLean, safeLean));
   const needleAngleDeg = leanToAngle(clampedLean);
-  const needleAnim = useSharedValue(needleAngleDeg);
+  const needleRad = ((needleAngleDeg - 90) * Math.PI) / 180;
+  const needleX2 = cx + needleR * Math.cos(needleRad);
+  const needleY2 = cy + needleR * Math.sin(needleRad);
 
-  useEffect(() => {
-    needleAnim.value = withTiming(leanToAngle(Math.max(MIN_LEAN, Math.min(MAX_LEAN, leanAngle))), {
-      duration: 80,
-      easing: Easing.out(Easing.quad),
-    });
-  }, [leanAngle]);
-
-  const animatedNeedleProps = useAnimatedProps(() => {
-    const rad = ((needleAnim.value - 90) * Math.PI) / 180;
-    const x2 = cx + needleR * Math.cos(rad);
-    const y2 = cy + needleR * Math.sin(rad);
-    return { x2: `${x2}`, y2: `${y2}` };
-  });
-
-  const AnimatedLine = Animated.createAnimatedComponent(Line);
-
-  const isLeft = leanAngle < 0;
-  const leanColor = isLeft ? COLORS.left : leanAngle > 0 ? COLORS.right : COLORS.neutral;
-  const absLean = Math.abs(leanAngle).toFixed(1);
-
-  // Draw left arc (210 to 270)
+  const isLeft = safeLean < 0;
+  const leanColor = isLeft ? COLORS.left : safeLean > 0 ? COLORS.right : COLORS.neutral;
   const leftArcPath = describeArc(cx, cy, (outerR + innerR) / 2, 210, 270);
-  // Draw right arc (270 to 330)
   const rightArcPath = describeArc(cx, cy, (outerR + innerR) / 2, 270, 330);
-
-  // Active arc based on lean
   const zeroAngle = 270;
   const activeArcPath =
-    leanAngle < 0
+    safeLean < 0
       ? describeArc(cx, cy, (outerR + innerR) / 2, leanToAngle(clampedLean), zeroAngle)
-      : leanAngle > 0
-      ? describeArc(cx, cy, (outerR + innerR) / 2, zeroAngle, leanToAngle(clampedLean))
-      : null;
+      : safeLean > 0
+        ? describeArc(cx, cy, (outerR + innerR) / 2, zeroAngle, leanToAngle(clampedLean))
+        : null;
 
-  // Max markers
-  const maxLeftAngle = leanToAngle(Math.max(MIN_LEAN, Math.min(MAX_LEAN, maxLeft)));
-  const maxRightAngle = leanToAngle(Math.max(MIN_LEAN, Math.min(MAX_LEAN, maxRight)));
-
+  const maxLeftAngle = leanToAngle(Math.max(minLean, Math.min(maxLean, maxLeft)));
+  const maxRightAngle = leanToAngle(Math.max(minLean, Math.min(maxLean, maxRight)));
   const tickAngles = [-60, -45, -30, -15, 0, 15, 30, 45, 60];
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Svg width={size} height={size}>
-        {/* Background arc track */}
         <Path
           d={leftArcPath}
           stroke={`${COLORS.left}33`}
@@ -126,7 +91,6 @@ export const LeanAngleGauge: React.FC<Props> = ({
           strokeLinecap="round"
         />
 
-        {/* Active arc */}
         {activeArcPath && (
           <Path
             d={activeArcPath}
@@ -138,7 +102,6 @@ export const LeanAngleGauge: React.FC<Props> = ({
           />
         )}
 
-        {/* Tick marks */}
         {tickAngles.map((tick) => {
           const screenAngle = leanToAngle(tick);
           const rad = ((screenAngle - 90) * Math.PI) / 180;
@@ -158,7 +121,6 @@ export const LeanAngleGauge: React.FC<Props> = ({
           );
         })}
 
-        {/* Max left marker */}
         {Math.abs(maxLeft) > 1 && (() => {
           const rad = ((maxLeftAngle - 90) * Math.PI) / 180;
           const mr = outerR + size * 0.08;
@@ -173,7 +135,6 @@ export const LeanAngleGauge: React.FC<Props> = ({
           );
         })()}
 
-        {/* Max right marker */}
         {Math.abs(maxRight) > 1 && (() => {
           const rad = ((maxRightAngle - 90) * Math.PI) / 180;
           const mr = outerR + size * 0.08;
@@ -188,18 +149,17 @@ export const LeanAngleGauge: React.FC<Props> = ({
           );
         })()}
 
-        {/* Needle */}
-        <AnimatedLine
-          x1={`${cx}`}
-          y1={`${cy}`}
+        <Line
+          x1={cx}
+          y1={cy}
+          x2={needleX2}
+          y2={needleY2}
           stroke={leanColor}
           strokeWidth={3}
           strokeLinecap="round"
-          animatedProps={animatedNeedleProps}
         />
         <Circle cx={cx} cy={cy} r={size * 0.04} fill={COLORS.card} stroke={leanColor} strokeWidth={2} />
 
-        {/* L / R labels */}
         <SvgText
           x={cx - outerR - size * 0.08}
           y={cy + size * 0.06}
@@ -222,16 +182,15 @@ export const LeanAngleGauge: React.FC<Props> = ({
         </SvgText>
       </Svg>
 
-      {/* Center overlay text */}
       <View style={[styles.centerOverlay, { width: size * 0.55, height: size * 0.55 }]}>
         <Text style={[styles.angleText, { fontSize: size * 0.22, color: leanColor }]}>
-          {Math.abs(leanAngle).toFixed(1)}
+          {Math.abs(safeLean).toFixed(1)}
         </Text>
         <Text style={[styles.unitText, { fontSize: size * 0.07, color: COLORS.neutral }]}>
           degrees
         </Text>
         <Text style={[styles.directionText, { fontSize: size * 0.07, color: leanColor }]}>
-          {leanAngle < -0.5 ? '◄ LEFT' : leanAngle > 0.5 ? 'RIGHT ►' : 'UPRIGHT'}
+          {safeLean < -0.5 ? '◄ LEFT' : safeLean > 0.5 ? 'RIGHT ►' : 'UPRIGHT'}
         </Text>
       </View>
     </View>
@@ -259,7 +218,7 @@ const styles = StyleSheet.create({
   },
   directionText: {
     fontWeight: '700',
-    marginTop: 4,
+    marginTop: 2,
     letterSpacing: 1,
   },
 });

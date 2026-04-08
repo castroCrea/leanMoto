@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { initDatabase } from './src/database/database';
+import { AppErrorBoundary } from './src/components/app/AppErrorBoundary';
 
 export default function App() {
   const [dbReady, setDbReady] = useState(false);
@@ -38,7 +39,9 @@ export default function App() {
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <StatusBar style="light" backgroundColor="#0A0A0F" />
-        <AppNavigator />
+        <AppErrorBoundary context="root-navigation">
+          <AppNavigator />
+        </AppErrorBoundary>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

@@ -27,6 +27,7 @@ import { GForceGauge } from '../components/gauges/GForceGauge';
 import { MetricCard } from '../components/common/MetricCard';
 import { voiceService } from '../services/voiceService';
 import { formatDuration, formatDistance } from '../utils/calculations';
+import { AppErrorBoundary } from '../components/app/AppErrorBoundary';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -97,130 +98,132 @@ export const DashboardScreen: React.FC = () => {
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor="#0A0A0F" />
 
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header row */}
-        <View style={styles.headerRow}>
-          <View style={styles.headerStat}>
-            <Text style={styles.headerLabel}>TIME</Text>
-            <Text style={styles.headerValue}>
-              {formatDuration(currentMetrics.elapsedTime)}
-            </Text>
-          </View>
-          <View style={styles.statusDot}>
-            <View style={[styles.dot, { backgroundColor: isRiding ? '#00D97E' : '#8899AA' }]} />
-            <Text style={styles.statusText}>{isRiding ? 'RIDING' : 'IDLE'}</Text>
-          </View>
-          <View style={styles.headerStat}>
-            <Text style={styles.headerLabel}>DIST</Text>
-            <Text style={styles.headerValue}>
-              {formatDistance(currentMetrics.distance, unitSystem)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Sensor status */}
-        {!isAvailable && (
-          <View style={styles.sensorWarning}>
-            <Text style={styles.sensorWarningText}>⚠ Sensors unavailable – simulation mode</Text>
-          </View>
-        )}
-
-        {/* Main lean angle gauge */}
-        <View style={styles.gaugeContainer}>
-          <LeanAngleGauge
-            leanAngle={leanAngle}
-            maxLeft={currentMetrics.leftMaxAngle}
-            maxRight={currentMetrics.rightMaxAngle}
-            size={Math.min(SCREEN_WIDTH - 32, 300)}
-          />
-        </View>
-
-        {/* Speed + GForce row */}
-        <View style={styles.secondaryGaugesRow}>
-          <SpeedGauge
-            speed={currentMetrics.speed}
-            maxSpeed={currentMetrics.maxSpeedSession}
-            unit={unitSystem}
-            size={160}
-          />
-          <GForceGauge
-            gForceX={currentMetrics.gForceX}
-            gForceY={currentMetrics.gForceY}
-            size={160}
-          />
-        </View>
-
-        {/* Metric cards row */}
-        <View style={styles.metricsRow}>
-          <MetricCard
-            title="SPEED"
-            value={currentMetrics.speed}
-            unit={unitSystem === 'imperial' ? 'mph' : 'km/h'}
-            color="#00D97E"
-            size="small"
-          />
-          <MetricCard
-            title="G-FORCE"
-            value={currentMetrics.gForce}
-            unit="G"
-            color="#FF8800"
-            size="small"
-          />
-          <MetricCard
-            title="MAX LEAN"
-            value={currentMetrics.maxLeanAngleSession}
-            unit="°"
-            color="#00B4FF"
-            size="small"
-          />
-          <MetricCard
-            title="MAX SPEED"
-            value={currentMetrics.maxSpeedSession}
-            unit={unitSystem === 'imperial' ? 'mph' : 'km/h'}
-            color="#8800FF"
-            size="small"
-          />
-        </View>
-
-        {/* L/R max lean row */}
-        <View style={styles.lrRow}>
-          <View style={styles.lrCard}>
-            <Text style={styles.lrLabel}>◄ MAX LEFT</Text>
-            <Text style={[styles.lrValue, { color: '#00B4FF' }]}>
-              {Math.abs(currentMetrics.leftMaxAngle).toFixed(1)}°
-            </Text>
-          </View>
-          <View style={styles.lrDivider} />
-          <View style={styles.lrCard}>
-            <Text style={styles.lrLabel}>MAX RIGHT ►</Text>
-            <Text style={[styles.lrValue, { color: '#FF3A2F' }]}>
-              {Math.abs(currentMetrics.rightMaxAngle).toFixed(1)}°
-            </Text>
-          </View>
-        </View>
-
-        {/* Start/Stop button */}
-        <View style={styles.buttonContainer}>
-          <Animated.View style={pulseStyle}>
-            <TouchableOpacity
-              style={[
-                styles.rideButton,
-                { backgroundColor: isRiding ? '#FF3A2F' : '#00B4FF' },
-              ]}
-              onPress={handleToggleRide}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.rideButtonText}>
-                {isRiding ? '■  STOP RIDE' : '▶  START RIDE'}
+      <AppErrorBoundary context="dashboard-screen">
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header row */}
+          <View style={styles.headerRow}>
+            <View style={styles.headerStat}>
+              <Text style={styles.headerLabel}>TIME</Text>
+              <Text style={styles.headerValue}>
+                {formatDuration(currentMetrics.elapsedTime)}
               </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-      </ScrollView>
+            </View>
+            <View style={styles.statusDot}>
+              <View style={[styles.dot, { backgroundColor: isRiding ? '#00D97E' : '#8899AA' }]} />
+              <Text style={styles.statusText}>{isRiding ? 'RIDING' : 'IDLE'}</Text>
+            </View>
+            <View style={styles.headerStat}>
+              <Text style={styles.headerLabel}>DIST</Text>
+              <Text style={styles.headerValue}>
+                {formatDistance(currentMetrics.distance, unitSystem)}
+              </Text>
+            </View>
+          </View>
+
+          {/* Sensor status */}
+          {!isAvailable && (
+            <View style={styles.sensorWarning}>
+              <Text style={styles.sensorWarningText}>Sensors unavailable - simulation mode</Text>
+            </View>
+          )}
+
+          {/* Main lean angle gauge */}
+          <View style={styles.gaugeContainer}>
+            <LeanAngleGauge
+              leanAngle={leanAngle}
+              maxLeft={currentMetrics.leftMaxAngle}
+              maxRight={currentMetrics.rightMaxAngle}
+              size={Math.min(SCREEN_WIDTH - 32, 300)}
+            />
+          </View>
+
+          {/* Speed + GForce row */}
+          <View style={styles.secondaryGaugesRow}>
+            <SpeedGauge
+              speed={currentMetrics.speed}
+              maxSpeed={currentMetrics.maxSpeedSession}
+              unit={unitSystem}
+              size={160}
+            />
+            <GForceGauge
+              gForceX={currentMetrics.gForceX}
+              gForceY={currentMetrics.gForceY}
+              size={160}
+            />
+          </View>
+
+          {/* Metric cards row */}
+          <View style={styles.metricsRow}>
+            <MetricCard
+              title="SPEED"
+              value={currentMetrics.speed}
+              unit={unitSystem === 'imperial' ? 'mph' : 'km/h'}
+              color="#00D97E"
+              size="small"
+            />
+            <MetricCard
+              title="G-FORCE"
+              value={currentMetrics.gForce}
+              unit="G"
+              color="#FF8800"
+              size="small"
+            />
+            <MetricCard
+              title="MAX LEAN"
+              value={currentMetrics.maxLeanAngleSession}
+              unit="deg"
+              color="#00B4FF"
+              size="small"
+            />
+            <MetricCard
+              title="MAX SPEED"
+              value={currentMetrics.maxSpeedSession}
+              unit={unitSystem === 'imperial' ? 'mph' : 'km/h'}
+              color="#8800FF"
+              size="small"
+            />
+          </View>
+
+          {/* L/R max lean row */}
+          <View style={styles.lrRow}>
+            <View style={styles.lrCard}>
+              <Text style={styles.lrLabel}>◄ MAX LEFT</Text>
+              <Text style={[styles.lrValue, { color: '#00B4FF' }]}>
+                {Math.abs(currentMetrics.leftMaxAngle).toFixed(1)}°
+              </Text>
+            </View>
+            <View style={styles.lrDivider} />
+            <View style={styles.lrCard}>
+              <Text style={styles.lrLabel}>MAX RIGHT ►</Text>
+              <Text style={[styles.lrValue, { color: '#FF3A2F' }]}>
+                {Math.abs(currentMetrics.rightMaxAngle).toFixed(1)}°
+              </Text>
+            </View>
+          </View>
+
+          {/* Start/Stop button */}
+          <View style={styles.buttonContainer}>
+            <Animated.View style={pulseStyle}>
+              <TouchableOpacity
+                style={[
+                  styles.rideButton,
+                  { backgroundColor: isRiding ? '#FF3A2F' : '#00B4FF' },
+                ]}
+                onPress={handleToggleRide}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.rideButtonText}>
+                  {isRiding ? '■  STOP RIDE' : '▶  START RIDE'}
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        </ScrollView>
+      </AppErrorBoundary>
     </SafeAreaView>
   );
 };

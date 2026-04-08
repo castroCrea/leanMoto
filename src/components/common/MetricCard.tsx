@@ -1,11 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
 
 interface Props {
   title: string;
@@ -22,31 +16,17 @@ export const MetricCard: React.FC<Props> = ({
   color = '#00B4FF',
   size = 'small',
 }) => {
-  const opacity = useSharedValue(1);
-
-  useEffect(() => {
-    opacity.value = withTiming(0.5, { duration: 60, easing: Easing.out(Easing.quad) }, () => {
-      opacity.value = withTiming(1, { duration: 120 });
-    });
-  }, [value]);
-
-  const animStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
-
   const isLarge = size === 'large';
 
   return (
     <View style={[styles.card, isLarge && styles.cardLarge]}>
       <Text style={[styles.title, isLarge && styles.titleLarge]}>{title}</Text>
-      <Animated.View style={[styles.valueRow, animStyle]}>
+      <View style={styles.valueRow}>
         <Text style={[styles.value, { color }, isLarge && styles.valueLarge]}>
           {typeof value === 'number' ? value.toFixed(value < 10 ? 1 : 0) : value}
         </Text>
-        {unit && (
-          <Text style={[styles.unit, isLarge && styles.unitLarge]}>{unit}</Text>
-        )}
-      </Animated.View>
+        {unit && <Text style={[styles.unit, isLarge && styles.unitLarge]}>{unit}</Text>}
+      </View>
     </View>
   );
 };
