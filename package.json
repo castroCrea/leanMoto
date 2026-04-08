@@ -17,7 +17,7 @@
     "expo": "^55.0.12",
     "expo-av": "~13.10.4",
     "expo-haptics": "~12.8.1",
-    "expo-keep-awake": "~12.8.2",
+    "expo-keep-awake": "~55.0.6",
     "expo-location": "~16.5.2",
     "expo-sensors": "~12.9.1",
     "expo-speech": "~11.7.0",

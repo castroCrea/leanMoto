@@ -39,8 +39,7 @@
     "plugins": [
       "expo-location",
       "expo-sensors",
-      "expo-av",
-      ["expo-keep-awake"]
+      "expo-av"
     ]
   }
 }
