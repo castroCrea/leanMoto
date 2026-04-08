@@ -120,10 +120,40 @@ export const RideDetailScreen: React.FC = () => {
 
         {/* Stats grid */}
         <View style={styles.statsGrid}>
-          <MetricCard title="DISTANCE" value={formatDistance(ride.distance, 'metric')} color="#00D97E" size="large" />
-          <MetricCard title="DURATION" value={formatDuration(ride.duration)} color="#00B4FF" size="large" />
-          <MetricCard title="AVG SPEED" value={ride.avgSpeed} unit="km/h" color="#8800FF" size="large" />
-          <MetricCard title="TOP SPEED" value={ride.maxSpeed} unit="km/h" color="#FF8800" size="large" />
+          <View style={styles.statsGridItem}>
+            <MetricCard
+              title="DISTANCE"
+              value={formatDistance(ride.distance, 'metric')}
+              color="#00D97E"
+              size="large"
+            />
+          </View>
+          <View style={styles.statsGridItem}>
+            <MetricCard
+              title="DURATION"
+              value={formatDuration(ride.duration)}
+              color="#00B4FF"
+              size="large"
+            />
+          </View>
+          <View style={styles.statsGridItem}>
+            <MetricCard
+              title="AVG SPEED"
+              value={ride.avgSpeed}
+              unit="km/h"
+              color="#8800FF"
+              size="large"
+            />
+          </View>
+          <View style={styles.statsGridItem}>
+            <MetricCard
+              title="TOP SPEED"
+              value={ride.maxSpeed}
+              unit="km/h"
+              color="#FF8800"
+              size="large"
+            />
+          </View>
         </View>
 
         {/* Lean angles */}
@@ -257,6 +287,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 10,
     marginBottom: 8,
+  },
+  statsGridItem: {
+    width: '48%',
   },
   section: {
     paddingHorizontal: 16,

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useRideHistory } from '../hooks/useRideHistory';
 import { RideCard } from '../components/common/RideCard';
 import { Ride } from '../types/ride';
@@ -25,9 +26,13 @@ type RootStackParamList = {
 export const RideHistoryScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { rides, loading, error, stats, refreshRides, deleteRide } = useRideHistory();
+  const isSwipingRef = useRef(false);
 
   const handleRidePress = useCallback(
     (ride: Ride) => {
+      if (isSwipingRef.current) {
+        return;
+      }
       navigation.navigate('RideDetail', { rideId: ride.id });
     },
     [navigation],
@@ -53,15 +58,45 @@ export const RideHistoryScreen: React.FC = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: Ride }) => (
-      <View style={styles.cardWrapper}>
-        <RideCard ride={item} onPress={() => handleRidePress(item)} />
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => handleDeletePress(item)}
-        >
-          <Ionicons name="trash-outline" size={18} color="#FF3A2F" />
-        </TouchableOpacity>
-      </View>
+      <Swipeable
+        friction={2}
+        leftThreshold={72}
+        rightThreshold={9999}
+        dragOffsetFromLeftEdge={12}
+        dragOffsetFromRightEdge={9999}
+        overshootLeft={false}
+        overshootRight={false}
+        onSwipeableOpenStartDrag={() => {
+          isSwipingRef.current = true;
+        }}
+        onSwipeableCloseStartDrag={() => {
+          isSwipingRef.current = true;
+        }}
+        onSwipeableOpen={() => {
+          isSwipingRef.current = false;
+        }}
+        onSwipeableClose={() => {
+          setTimeout(() => {
+            isSwipingRef.current = false;
+          }, 80);
+        }}
+        renderLeftActions={() => (
+          <View style={styles.swipeActionContainer}>
+            <TouchableOpacity
+              style={styles.swipeDeleteAction}
+              onPress={() => handleDeletePress(item)}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="trash-outline" size={20} color="#FFFFFF" />
+              <Text style={styles.swipeDeleteText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      >
+        <View style={styles.cardWrapper}>
+          <RideCard ride={item} onPress={() => handleRidePress(item)} />
+        </View>
+      </Swipeable>
     ),
     [handleRidePress, handleDeletePress],
   );
@@ -193,13 +228,25 @@ const styles = StyleSheet.create({
   cardWrapper: {
     position: 'relative',
   },
-  deleteButton: {
-    position: 'absolute',
-    top: 14,
-    right: 28,
-    padding: 8,
-    backgroundColor: '#FF3A2F22',
-    borderRadius: 8,
+  swipeActionContainer: {
+    justifyContent: 'center',
+    marginVertical: 6,
+    marginLeft: 16,
+  },
+  swipeDeleteAction: {
+    width: 112,
+    height: '100%',
+    minHeight: 126,
+    borderRadius: 16,
+    backgroundColor: '#FF3A2F',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  swipeDeleteText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   loadingContainer: {
     flex: 1,

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { RidePoint } from '../../types/ride';
 
@@ -8,9 +8,10 @@ interface Props {
   height?: number;
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
 export const LeanAngleChart: React.FC<Props> = ({ points, height = 200 }) => {
+  const { width } = useWindowDimensions();
+  const chartWidth = Math.max(width - 44, 260);
+
   const chartData = useMemo(() => {
     if (points.length === 0) {
       return { labels: ['0'], datasets: [{ data: [0] }] };
@@ -60,7 +61,7 @@ export const LeanAngleChart: React.FC<Props> = ({ points, height = 200 }) => {
     <View style={styles.container}>
       <LineChart
         data={chartData}
-        width={SCREEN_WIDTH - 32}
+        width={chartWidth}
         height={height}
         chartConfig={{
           backgroundColor: '#1A1A2E',
@@ -90,6 +91,7 @@ export const LeanAngleChart: React.FC<Props> = ({ points, height = 200 }) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    width: '100%',
   },
   chart: {
     borderRadius: 12,
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 16,
+    marginHorizontal: 2,
   },
   emptyText: {
     color: '#8899AA',

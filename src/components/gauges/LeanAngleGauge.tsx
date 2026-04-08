@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, G, Line, Rect, Text as SvgText } from 'react-native-svg';
 
 const COLORS = {
   left: '#00B4FF',
   right: '#FF3A2F',
   neutral: '#8899AA',
-  card: '#1A1A2E',
+  track: '#1A1A2E',
+  trackBorder: '#223344',
+  text: '#FFFFFF',
 };
 
 interface Props {
@@ -16,19 +18,8 @@ interface Props {
   size?: number;
 }
 
-function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
-  const rad = ((angleDeg - 90) * Math.PI) / 180;
-  return {
-    x: cx + r * Math.cos(rad),
-    y: cy + r * Math.sin(rad),
-  };
-}
-
-function describeArc(cx: number, cy: number, r: number, startAngle: number, endAngle: number) {
-  const start = polarToCartesian(cx, cy, r, endAngle);
-  const end = polarToCartesian(cx, cy, r, startAngle);
-  const largeArc = endAngle - startAngle <= 180 ? 0 : 1;
-  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 0 ${end.x} ${end.y}`;
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
 }
 
 export const LeanAngleGauge: React.FC<Props> = ({
@@ -37,160 +28,126 @@ export const LeanAngleGauge: React.FC<Props> = ({
   maxRight = 0,
   size = 280,
 }) => {
-  const cx = size / 2;
-  const cy = size / 2;
-  const outerR = size * 0.42;
-  const innerR = size * 0.34;
-  const needleR = size * 0.38;
+  const width = size;
+  const height = Math.max(180, size * 0.62);
   const minLean = -60;
   const maxLean = 60;
-  const arcStart = 210;
-  const arcEnd = 330;
-
-  const leanToAngle = (lean: number) =>
-    arcStart + ((lean - minLean) / (maxLean - minLean)) * (arcEnd - arcStart);
-
   const safeLean = Number.isFinite(leanAngle) ? leanAngle : 0;
-  const clampedLean = Math.max(minLean, Math.min(maxLean, safeLean));
-  const needleAngleDeg = leanToAngle(clampedLean);
-  const needleRad = ((needleAngleDeg - 90) * Math.PI) / 180;
-  const needleX2 = cx + needleR * Math.cos(needleRad);
-  const needleY2 = cy + needleR * Math.sin(needleRad);
+  const clampedLean = clamp(safeLean, minLean, maxLean);
+  const normalizedLean = (clampedLean - minLean) / (maxLean - minLean);
 
-  const isLeft = safeLean < 0;
-  const leanColor = isLeft ? COLORS.left : safeLean > 0 ? COLORS.right : COLORS.neutral;
-  const leftArcPath = describeArc(cx, cy, (outerR + innerR) / 2, 210, 270);
-  const rightArcPath = describeArc(cx, cy, (outerR + innerR) / 2, 270, 330);
-  const zeroAngle = 270;
-  const activeArcPath =
-    safeLean < 0
-      ? describeArc(cx, cy, (outerR + innerR) / 2, leanToAngle(clampedLean), zeroAngle)
-      : safeLean > 0
-        ? describeArc(cx, cy, (outerR + innerR) / 2, zeroAngle, leanToAngle(clampedLean))
-        : null;
+  const centerX = width / 2;
+  const trackY = height * 0.7;
+  const trackWidth = width * 0.82;
+  const trackStart = centerX - trackWidth / 2;
+  const trackEnd = centerX + trackWidth / 2;
+  const markerX = trackStart + normalizedLean * trackWidth;
+  const bikeBaseY = height * 0.34;
+  const bikeOffsetX = markerX - centerX;
+  const bikeTilt = clamp(clampedLean * 0.8, -42, 42);
+  const maxLeftX = trackStart + ((clamp(maxLeft, minLean, maxLean) - minLean) / (maxLean - minLean)) * trackWidth;
+  const maxRightX = trackStart + ((clamp(maxRight, minLean, maxLean) - minLean) / (maxLean - minLean)) * trackWidth;
 
-  const maxLeftAngle = leanToAngle(Math.max(minLean, Math.min(maxLean, maxLeft)));
-  const maxRightAngle = leanToAngle(Math.max(minLean, Math.min(maxLean, maxRight)));
-  const tickAngles = [-60, -45, -30, -15, 0, 15, 30, 45, 60];
+  const leanColor =
+    clampedLean < -0.5 ? COLORS.left : clampedLean > 0.5 ? COLORS.right : COLORS.neutral;
 
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
-      <Svg width={size} height={size}>
-        <Path
-          d={leftArcPath}
-          stroke={`${COLORS.left}33`}
-          strokeWidth={size * 0.055}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Path
-          d={rightArcPath}
-          stroke={`${COLORS.right}33`}
-          strokeWidth={size * 0.055}
-          fill="none"
-          strokeLinecap="round"
+    <View style={[styles.container, { width, height }]}>
+      <Svg width={width} height={height}>
+        <Rect
+          x={trackStart}
+          y={trackY - 8}
+          width={trackWidth}
+          height={16}
+          rx={8}
+          fill={COLORS.track}
+          stroke={COLORS.trackBorder}
+          strokeWidth={1}
         />
 
-        {activeArcPath && (
-          <Path
-            d={activeArcPath}
-            stroke={leanColor}
-            strokeWidth={size * 0.055}
-            fill="none"
-            strokeLinecap="round"
-            opacity={0.9}
-          />
-        )}
+        <Line
+          x1={centerX}
+          y1={trackY - 18}
+          x2={centerX}
+          y2={trackY + 18}
+          stroke={COLORS.neutral}
+          strokeWidth={2}
+          strokeDasharray="4 4"
+        />
 
-        {tickAngles.map((tick) => {
-          const screenAngle = leanToAngle(tick);
-          const rad = ((screenAngle - 90) * Math.PI) / 180;
-          const major = tick % 30 === 0;
-          const r1 = major ? outerR - size * 0.01 : outerR + size * 0.01;
-          const r2 = major ? outerR + size * 0.06 : outerR + size * 0.04;
+        {[-60, -30, 0, 30, 60].map((tick) => {
+          const x = trackStart + ((tick - minLean) / (maxLean - minLean)) * trackWidth;
           return (
-            <Line
-              key={tick}
-              x1={cx + r1 * Math.cos(rad)}
-              y1={cy + r1 * Math.sin(rad)}
-              x2={cx + r2 * Math.cos(rad)}
-              y2={cy + r2 * Math.sin(rad)}
-              stroke={major ? COLORS.neutral : `${COLORS.neutral}66`}
-              strokeWidth={major ? 2 : 1}
-            />
+            <React.Fragment key={tick}>
+              <Line
+                x1={x}
+                y1={trackY - 14}
+                x2={x}
+                y2={trackY + 14}
+                stroke={tick === 0 ? COLORS.neutral : `${COLORS.neutral}88`}
+                strokeWidth={tick === 0 ? 2 : 1.5}
+              />
+              <SvgText
+                x={x}
+                y={trackY + 34}
+                fill="#667788"
+                fontSize={12}
+                fontWeight="700"
+                textAnchor="middle"
+              >
+                {tick}
+              </SvgText>
+            </React.Fragment>
           );
         })}
 
-        {Math.abs(maxLeft) > 1 && (() => {
-          const rad = ((maxLeftAngle - 90) * Math.PI) / 180;
-          const mr = outerR + size * 0.08;
-          return (
-            <Circle
-              cx={cx + mr * Math.cos(rad)}
-              cy={cy + mr * Math.sin(rad)}
-              r={size * 0.018}
-              fill={COLORS.left}
-              opacity={0.8}
-            />
-          );
-        })()}
-
-        {Math.abs(maxRight) > 1 && (() => {
-          const rad = ((maxRightAngle - 90) * Math.PI) / 180;
-          const mr = outerR + size * 0.08;
-          return (
-            <Circle
-              cx={cx + mr * Math.cos(rad)}
-              cy={cy + mr * Math.sin(rad)}
-              r={size * 0.018}
-              fill={COLORS.right}
-              opacity={0.8}
-            />
-          );
-        })()}
+        {Math.abs(maxLeft) > 1 && (
+          <Circle cx={maxLeftX} cy={trackY} r={6} fill={COLORS.left} opacity={0.85} />
+        )}
+        {Math.abs(maxRight) > 1 && (
+          <Circle cx={maxRightX} cy={trackY} r={6} fill={COLORS.right} opacity={0.85} />
+        )}
 
         <Line
-          x1={cx}
-          y1={cy}
-          x2={needleX2}
-          y2={needleY2}
+          x1={markerX}
+          y1={trackY}
+          x2={markerX}
+          y2={bikeBaseY + 30}
           stroke={leanColor}
           strokeWidth={3}
           strokeLinecap="round"
         />
-        <Circle cx={cx} cy={cy} r={size * 0.04} fill={COLORS.card} stroke={leanColor} strokeWidth={2} />
+
+        <Circle cx={markerX} cy={trackY} r={11} fill={leanColor} />
 
         <SvgText
-          x={cx - outerR - size * 0.08}
-          y={cy + size * 0.06}
+          x={trackStart - 18}
+          y={trackY + 4}
           fill={COLORS.left}
-          fontSize={size * 0.06}
-          fontWeight="bold"
+          fontSize={15}
+          fontWeight="800"
           textAnchor="middle"
         >
           L
         </SvgText>
         <SvgText
-          x={cx + outerR + size * 0.08}
-          y={cy + size * 0.06}
+          x={trackEnd + 18}
+          y={trackY + 4}
           fill={COLORS.right}
-          fontSize={size * 0.06}
-          fontWeight="bold"
+          fontSize={15}
+          fontWeight="800"
           textAnchor="middle"
         >
           R
         </SvgText>
       </Svg>
 
-      <View style={[styles.centerOverlay, { width: size * 0.55, height: size * 0.55 }]}>
-        <Text style={[styles.angleText, { fontSize: size * 0.22, color: leanColor }]}>
-          {Math.abs(safeLean).toFixed(1)}
+      <View style={styles.readout}>
+        <Text style={[styles.angleText, { color: leanColor }]}>
+          {Math.abs(clampedLean).toFixed(1)}°
         </Text>
-        <Text style={[styles.unitText, { fontSize: size * 0.07, color: COLORS.neutral }]}>
-          degrees
-        </Text>
-        <Text style={[styles.directionText, { fontSize: size * 0.07, color: leanColor }]}>
-          {safeLean < -0.5 ? '◄ LEFT' : safeLean > 0.5 ? 'RIGHT ►' : 'UPRIGHT'}
+        <Text style={styles.labelText}>
+          {clampedLean < -0.5 ? 'lean left' : clampedLean > 0.5 ? 'lean right' : 'upright'}
         </Text>
       </View>
     </View>
@@ -201,24 +158,23 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
   },
-  centerOverlay: {
+  readout: {
     position: 'absolute',
+    top: 12,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   angleText: {
+    fontSize: 48,
     fontWeight: '900',
     letterSpacing: -2,
   },
-  unitText: {
-    fontWeight: '400',
-    marginTop: -4,
-  },
-  directionText: {
+  labelText: {
+    color: '#8899AA',
+    fontSize: 14,
     fontWeight: '700',
-    marginTop: 2,
-    letterSpacing: 1,
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+    marginTop: -2,
   },
 });

@@ -99,6 +99,17 @@ export const DashboardScreen: React.FC = () => {
       <StatusBar barStyle="light-content" backgroundColor="#0A0A0F" />
 
       <AppErrorBoundary context="dashboard-screen">
+        <TouchableOpacity
+          style={[
+            styles.floatingRideButton,
+            { backgroundColor: isRiding ? '#FF3A2F' : '#00B4FF' },
+          ]}
+          onPress={handleToggleRide}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.floatingRideButtonIcon}>{isRiding ? '■' : '▶'}</Text>
+        </TouchableOpacity>
+
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
@@ -158,34 +169,42 @@ export const DashboardScreen: React.FC = () => {
 
           {/* Metric cards row */}
           <View style={styles.metricsRow}>
-            <MetricCard
-              title="SPEED"
-              value={currentMetrics.speed}
-              unit={unitSystem === 'imperial' ? 'mph' : 'km/h'}
-              color="#00D97E"
-              size="small"
-            />
-            <MetricCard
-              title="G-FORCE"
-              value={currentMetrics.gForce}
-              unit="G"
-              color="#FF8800"
-              size="small"
-            />
-            <MetricCard
-              title="MAX LEAN"
-              value={currentMetrics.maxLeanAngleSession}
-              unit="deg"
-              color="#00B4FF"
-              size="small"
-            />
-            <MetricCard
-              title="MAX SPEED"
-              value={currentMetrics.maxSpeedSession}
-              unit={unitSystem === 'imperial' ? 'mph' : 'km/h'}
-              color="#8800FF"
-              size="small"
-            />
+            <View style={styles.metricCardItem}>
+              <MetricCard
+                title="SPEED"
+                value={currentMetrics.speed}
+                unit={unitSystem === 'imperial' ? 'mph' : 'km/h'}
+                color="#00D97E"
+                size="small"
+              />
+            </View>
+            <View style={styles.metricCardItem}>
+              <MetricCard
+                title="G-FORCE"
+                value={currentMetrics.gForce}
+                unit="G"
+                color="#FF8800"
+                size="small"
+              />
+            </View>
+            <View style={styles.metricCardItem}>
+              <MetricCard
+                title="MAX LEAN"
+                value={currentMetrics.maxLeanAngleSession}
+                unit="deg"
+                color="#00B4FF"
+                size="small"
+              />
+            </View>
+            <View style={styles.metricCardItem}>
+              <MetricCard
+                title="MAX SPEED"
+                value={currentMetrics.maxSpeedSession}
+                unit={unitSystem === 'imperial' ? 'mph' : 'km/h'}
+                color="#8800FF"
+                size="small"
+              />
+            </View>
           </View>
 
           {/* L/R max lean row */}
@@ -238,6 +257,28 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 32,
+  },
+  floatingRideButton: {
+    position: 'absolute',
+    top: 120,
+    right: 16,
+    zIndex: 20,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOpacity: 0.28,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
+  },
+  floatingRideButtonIcon: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '900',
+    marginLeft: 1,
   },
   headerRow: {
     flexDirection: 'row',
@@ -304,10 +345,13 @@ const styles = StyleSheet.create({
   },
   metricsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
     paddingHorizontal: 16,
     marginVertical: 8,
     gap: 8,
+  },
+  metricCardItem: {
+    width: '48%',
   },
   lrRow: {
     flexDirection: 'row',

@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LineChart } from 'react-native-chart-kit';
@@ -13,10 +13,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRideHistory } from '../hooks/useRideHistory';
 import { formatDistance, formatDuration } from '../utils/calculations';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
 export const AnalyticsScreen: React.FC = () => {
   const { rides, loading, stats } = useRideHistory();
+  const { width } = useWindowDimensions();
+  const chartWidth = Math.max(width - 44, 260);
 
   if (loading) {
     return (
@@ -93,26 +93,32 @@ export const AnalyticsScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Personal Bests</Text>
           <View style={styles.pbRow}>
-            <View style={styles.pbCard}>
+            <View style={styles.pbCardWrap}>
+              <View style={styles.pbCard}>
               <Ionicons name="trending-up" size={20} color="#00B4FF" />
               <Text style={[styles.pbValue, { color: '#00B4FF' }]}>
                 {stats.personalBestLeanAngle.toFixed(1)}°
               </Text>
               <Text style={styles.pbLabel}>Max Lean</Text>
             </View>
-            <View style={styles.pbCard}>
+            </View>
+            <View style={styles.pbCardWrap}>
+              <View style={styles.pbCard}>
               <Ionicons name="speedometer" size={20} color="#FF3A2F" />
-              <Text style={[styles.pbValue, { color: '#FF3A2F' }]}>
+              <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.pbValue, styles.pbValueCompact, { color: '#FF3A2F' }]}>
                 {stats.personalBestSpeed.toFixed(0)} km/h
               </Text>
               <Text style={styles.pbLabel}>Top Speed</Text>
             </View>
-            <View style={styles.pbCard}>
+            </View>
+            <View style={styles.pbCardWrap}>
+              <View style={styles.pbCard}>
               <Ionicons name="refresh-circle" size={20} color="#8800FF" />
               <Text style={[styles.pbValue, { color: '#8800FF' }]}>
                 {stats.avgMaxLeanAngle.toFixed(1)}°
               </Text>
               <Text style={styles.pbLabel}>Avg Max Lean</Text>
+            </View>
             </View>
           </View>
         </View>
@@ -123,7 +129,7 @@ export const AnalyticsScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>Lean Angle Trend (Last {recentRides.length} Rides)</Text>
             <LineChart
               data={trendData}
-              width={SCREEN_WIDTH - 32}
+              width={chartWidth}
               height={180}
               chartConfig={{
                 backgroundColor: '#1A1A2E',
@@ -153,7 +159,7 @@ export const AnalyticsScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>Speed Trend (Last {recentRides.length} Rides)</Text>
             <LineChart
               data={speedTrendData}
-              width={SCREEN_WIDTH - 32}
+              width={chartWidth}
               height={160}
               chartConfig={{
                 backgroundColor: '#1A1A2E',
@@ -191,14 +197,14 @@ export const AnalyticsScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>Recent Rides Summary</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
-                <Text style={[styles.tableCell, styles.tableHeaderText, { flex: 2 }]}>Date</Text>
+                <Text style={[styles.tableCell, styles.tableHeaderText]}>Date</Text>
                 <Text style={[styles.tableCell, styles.tableHeaderText]}>Lean°</Text>
                 <Text style={[styles.tableCell, styles.tableHeaderText]}>km/h</Text>
                 <Text style={[styles.tableCell, styles.tableHeaderText]}>km</Text>
               </View>
               {rides.slice(0, 10).map((ride) => (
                 <View key={ride.id} style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 2, color: '#AABBCC', fontSize: 12 }]}>
+                  <Text numberOfLines={1} style={[styles.tableCell, styles.tableValueText]}>
                     {new Date(ride.startTime).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -220,10 +226,10 @@ export const AnalyticsScreen: React.FC = () => {
                   >
                     {ride.maxLeanAngle.toFixed(0)}°
                   </Text>
-                  <Text style={[styles.tableCell, { color: '#AABBCC', fontSize: 12 }]}>
+                  <Text numberOfLines={1} style={[styles.tableCell, styles.tableValueText]}>
                     {ride.maxSpeed.toFixed(0)}
                   </Text>
-                  <Text style={[styles.tableCell, { color: '#AABBCC', fontSize: 12 }]}>
+                  <Text numberOfLines={1} style={[styles.tableCell, styles.tableValueText]}>
                     {ride.distance.toFixed(1)}
                   </Text>
                 </View>
@@ -296,10 +302,13 @@ const styles = StyleSheet.create({
   },
   pbRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 10,
   },
+  pbCardWrap: {
+    width: '48%',
+  },
   pbCard: {
-    flex: 1,
     backgroundColor: '#1A1A2E',
     borderRadius: 12,
     padding: 14,
@@ -313,6 +322,11 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: -0.5,
   },
+  pbValueCompact: {
+    width: '100%',
+    textAlign: 'center',
+    fontSize: 20,
+  },
   pbLabel: {
     color: '#8899AA',
     fontSize: 10,
@@ -321,6 +335,7 @@ const styles = StyleSheet.create({
   },
   chart: {
     borderRadius: 12,
+    alignSelf: 'center',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -361,6 +376,10 @@ const styles = StyleSheet.create({
   tableCell: {
     flex: 1,
     textAlign: 'center',
+  },
+  tableValueText: {
+    color: '#AABBCC',
+    fontSize: 12,
   },
   tableHeaderText: {
     color: '#8899AA',

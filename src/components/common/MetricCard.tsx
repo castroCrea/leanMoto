@@ -20,12 +20,18 @@ export const MetricCard: React.FC<Props> = ({
 
   return (
     <View style={[styles.card, isLarge && styles.cardLarge]}>
-      <Text style={[styles.title, isLarge && styles.titleLarge]}>{title}</Text>
+      <Text numberOfLines={1} style={[styles.title, isLarge && styles.titleLarge]}>
+        {title}
+      </Text>
       <View style={styles.valueRow}>
-        <Text style={[styles.value, { color }, isLarge && styles.valueLarge]}>
+        <Text numberOfLines={1} style={[styles.value, { color }, isLarge && styles.valueLarge]}>
           {typeof value === 'number' ? value.toFixed(value < 10 ? 1 : 0) : value}
         </Text>
-        {unit && <Text style={[styles.unit, isLarge && styles.unitLarge]}>{unit}</Text>}
+        {unit && (
+          <Text numberOfLines={1} style={[styles.unit, isLarge && styles.unitLarge]}>
+            {unit}
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -37,7 +43,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     alignItems: 'center',
-    minWidth: 80,
+    minWidth: 0,
     borderWidth: 1,
     borderColor: '#223344',
   },
@@ -60,11 +66,14 @@ const styles = StyleSheet.create({
   valueRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
+    justifyContent: 'center',
+    width: '100%',
   },
   value: {
     fontSize: 28,
     fontWeight: '900',
     letterSpacing: -1,
+    flexShrink: 1,
   },
   valueLarge: {
     fontSize: 40,
@@ -75,6 +84,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 3,
     marginBottom: 2,
+    flexShrink: 1,
   },
   unitLarge: {
     fontSize: 14,
