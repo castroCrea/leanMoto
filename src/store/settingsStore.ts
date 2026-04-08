@@ -1,21 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { MMKV } from 'react-native-mmkv';
-import { StateStorage } from 'zustand/middleware';
-
-const storage = new MMKV({ id: 'settings-store' });
-
-const mmkvStorage: StateStorage = {
-  getItem: (name: string): string | null => {
-    return storage.getString(name) ?? null;
-  },
-  setItem: (name: string, value: string): void => {
-    storage.set(name, value);
-  },
-  removeItem: (name: string): void => {
-    storage.delete(name);
-  },
-};
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SettingsStore {
   unitSystem: 'metric' | 'imperial';
@@ -64,7 +49,7 @@ export const useSettingsStore = create<SettingsStore>()(
     }),
     {
       name: 'leanride-settings',
-      storage: createJSONStorage(() => mmkvStorage),
+      storage: createJSONStorage(() => AsyncStorage),
     },
   ),
 );

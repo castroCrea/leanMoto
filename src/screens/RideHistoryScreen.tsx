@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useRideHistory } from '../hooks/useRideHistory';
 import { RideCard } from '../components/common/RideCard';
@@ -23,7 +23,7 @@ type RootStackParamList = {
 };
 
 export const RideHistoryScreen: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { rides, loading, error, stats, refreshRides, deleteRide } = useRideHistory();
 
   const handleRidePress = useCallback(

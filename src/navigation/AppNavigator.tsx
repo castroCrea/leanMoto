@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
 import { DashboardScreen } from '../screens/DashboardScreen';
@@ -13,7 +13,7 @@ import { HUDScreen } from '../screens/HUDScreen';
 import { CalibrationScreen } from '../screens/CalibrationScreen';
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 const darkTheme = {
   ...DefaultTheme,
@@ -77,7 +77,7 @@ export function AppNavigator() {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          cardStyle: { backgroundColor: '#0A0A0F' },
+          contentStyle: { backgroundColor: '#0A0A0F' },
         }}
       >
         <Stack.Screen name="Main" component={TabNavigator} />

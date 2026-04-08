@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Slider = require('@react-native-community/slider').default;
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useSettingsStore } from '../store/settingsStore';
 import { deleteRide, getAllRides } from '../database/database';
@@ -22,7 +22,7 @@ type RootStackParamList = {
 };
 
 export const SettingsScreen: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {
     unitSystem,
     voiceAlertsEnabled,
