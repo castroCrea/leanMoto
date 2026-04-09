@@ -45,8 +45,7 @@
     },
     "plugins": [
       "expo-location",
-      "expo-sensors",
-      "expo-av"
+      "expo-sensors"
     ],
     "extra": {
       "eas": {

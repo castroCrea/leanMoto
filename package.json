@@ -19,7 +19,6 @@
     "@react-navigation/native": "^6.1.10",
     "@react-navigation/native-stack": "^6.9.26",
     "expo": "^55.0.12",
-    "expo-av": "~13.10.4",
     "expo-haptics": "~55.0.13",
     "expo-keep-awake": "~55.0.6",
     "expo-location": "~55.1.7",
