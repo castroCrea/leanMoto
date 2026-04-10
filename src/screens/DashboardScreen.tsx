@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, {
@@ -18,6 +18,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useKeepAwake } from 'expo-keep-awake';
+import * as ScreenOrientation from 'expo-screen-orientation';
+import { useNavigation } from '@react-navigation/native';
 import { useRideStore } from '../store/rideStore';
 import { useRideTracking } from '../hooks/useRideTracking';
 import { useSettingsStore } from '../store/settingsStore';
@@ -30,7 +32,13 @@ import { formatDuration, formatDistance } from '../utils/calculations';
 import { AppErrorBoundary } from '../components/app/AppErrorBoundary';
 import { useI18n } from '../i18n';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const FLOATING_BUTTON_TOP = 120;
+
+const TAB_BAR_DEFAULT_STYLE = {
+  backgroundColor: '#151617',
+  borderTopColor: '#141516',
+  borderTopWidth: 1,
+};
 
 export const DashboardScreen: React.FC = () => {
   const { t } = useI18n();
@@ -38,6 +46,10 @@ export const DashboardScreen: React.FC = () => {
   const { startTracking, stopTracking, isAvailable } = useRideTracking();
   const { keepScreenOn, voiceAlertsEnabled, highLeanAngleThreshold, unitSystem } =
     useSettingsStore();
+  const [isLandscape, setIsLandscape] = useState(false);
+  const navigation = useNavigation();
+  const { width, height } = useWindowDimensions();
+  const SCREEN_WIDTH = width;
 
   useKeepAwake();
 
@@ -74,6 +86,37 @@ export const DashboardScreen: React.FC = () => {
     }
   }, [currentMetrics.leanAngle, isRiding, voiceAlertsEnabled, highLeanAngleThreshold]);
 
+  // Hide / show tab bar based on landscape state
+  useEffect(() => {
+    if (isLandscape) {
+      navigation.getParent()?.setOptions({ tabBarStyle: { display: 'none' } });
+    } else {
+      navigation.getParent()?.setOptions({ tabBarStyle: TAB_BAR_DEFAULT_STYLE });
+    }
+  }, [isLandscape, navigation]);
+
+  // Restore portrait when screen loses focus
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', async () => {
+      if (isLandscape) {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+        setIsLandscape(false);
+      }
+    });
+    return unsubscribe;
+  }, [isLandscape, navigation]);
+
+  const handleToggleLandscape = useCallback(async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (isLandscape) {
+      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+      setIsLandscape(false);
+    } else {
+      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
+      setIsLandscape(true);
+    }
+  }, [isLandscape]);
+
   const handleToggleRide = useCallback(async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     if (isRiding) {
@@ -101,6 +144,14 @@ export const DashboardScreen: React.FC = () => {
       <StatusBar barStyle="light-content" backgroundColor="#151617" />
 
       <AppErrorBoundary context="dashboard-screen">
+        <TouchableOpacity
+          style={styles.floatingLandscapeButton}
+          onPress={handleToggleLandscape}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.floatingLandscapeButtonIcon}>{isLandscape ? '↕' : '↔'}</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={[
             styles.floatingRideButton,
@@ -262,7 +313,7 @@ const styles = StyleSheet.create({
   },
   floatingRideButton: {
     position: 'absolute',
-    top: 120,
+    top: FLOATING_BUTTON_TOP,
     right: 16,
     zIndex: 20,
     width: 52,
@@ -281,6 +332,28 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '900',
     marginLeft: 1,
+  },
+  floatingLandscapeButton: {
+    position: 'absolute',
+    top: FLOATING_BUTTON_TOP,
+    left: 16,
+    zIndex: 20,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: '#2A2F3D',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOpacity: 0.28,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
+  },
+  floatingLandscapeButtonIcon: {
+    color: '#E4E5E6',
+    fontSize: 22,
+    fontWeight: '900',
   },
   headerRow: {
     flexDirection: 'row',
