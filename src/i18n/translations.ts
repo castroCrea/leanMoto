@@ -127,7 +127,7 @@ export const translations = {
       title: 'Sensor Calibration',
       phonePlacement: 'Phone Placement',
       instructions:
-        '1. Mount your phone in the handlebar mount with the screen facing up.\n2. Place the bike on a level, flat surface.\n3. Keep the bike upright (not on side stand).\n4. Press "Calibrate" and hold still for 2 seconds.',
+        '1. Mount your phone in the handlebar mount in your preferred riding position.\n2. Place the bike on a level, flat surface.\n3. Keep the bike upright (not on side stand).\n4. Press "Calibrate" and hold still for 2 seconds.\nThe app will capture the gravity axis for your current 3-D mount angle.',
       liveSensorData: 'Live Sensor Data',
       sensorsUnavailable: '⚠ Physical sensors not available',
       rawX: 'Raw X',
@@ -143,7 +143,7 @@ export const translations = {
       offsetZ: 'Offset Z',
       mountAngleCorrection: 'Mount Angle Correction',
       mountAngleDescription:
-        "If your phone isn't perfectly flat on the mount, adjust this offset to compensate.",
+        'Fine-tune the lean angle offset if a small residual error remains after calibration.',
       calibrating: '⏳ Calibrating...',
       calibrated: '✓ Calibrated!',
       calibrate: '🎯 Calibrate',
@@ -327,7 +327,7 @@ export const translations = {
       title: 'Calibration des capteurs',
       phonePlacement: 'Position du telephone',
       instructions:
-        '1. Fixez votre telephone sur le support guidon, ecran vers le haut.\n2. Placez la moto sur une surface plane.\n3. Gardez la moto droite (pas sur la bequille).\n4. Appuyez sur "Calibrer" et restez immobile pendant 2 secondes.',
+        '1. Fixez votre telephone sur le support guidon dans votre position de conduite habituelle.\n2. Placez la moto sur une surface plane.\n3. Gardez la moto droite (pas sur la bequille).\n4. Appuyez sur "Calibrer" et restez immobile pendant 2 secondes.\nL\'application capture l\'axe de gravite pour votre angle de montage en 3D.',
       liveSensorData: 'Donnees capteur en direct',
       sensorsUnavailable: '⚠ Capteurs physiques indisponibles',
       rawX: 'X brut',
@@ -343,7 +343,7 @@ export const translations = {
       offsetZ: 'Offset Z',
       mountAngleCorrection: "Correction de l'angle de montage",
       mountAngleDescription:
-        "Si votre telephone n'est pas parfaitement a plat sur son support, ajustez cet offset.",
+        "Ajustez cet offset si un petit ecart residuel persiste apres la calibration.",
       calibrating: '⏳ Calibration...',
       calibrated: '✓ Calibre !',
       calibrate: '🎯 Calibrer',

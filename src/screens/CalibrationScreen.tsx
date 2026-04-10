@@ -33,8 +33,8 @@ export const CalibrationScreen: React.FC = () => {
   };
 
   const calibratedAccel = processAccelerometerData(accelerometer, calibration);
-  const { isPortrait, gravityAxisSign } = getLeanOrientation(calibrationOffsets);
-  const currentLean = calculateLeanAngle(calibratedAccel, isPortrait, gravityAxisSign);
+  const { isPortrait, gravityAxisSign, gravityMagnitude } = getLeanOrientation(calibrationOffsets);
+  const currentLean = calculateLeanAngle(calibratedAccel, isPortrait, gravityAxisSign, gravityMagnitude);
 
   const handleCalibrate = () => {
     setIsCalibrating(true);
@@ -43,7 +43,7 @@ export const CalibrationScreen: React.FC = () => {
       setCalibrationOffsets({
         x: accelerometer.x,
         y: accelerometer.y,
-        z: accelerometer.z - 1, // subtract 1G from Z (gravity when upright)
+        z: accelerometer.z, // store full gravity vector for 3-D mount support
       });
       setIsCalibrating(false);
       setCalibrated(true);
