@@ -54,8 +54,8 @@ export function useRideTracking() {
     };
 
     const calibratedAccel = processAccelerometerData(accelerometer, calibration);
-    const { isPortrait, gravityAxisSign } = getLeanOrientation(calibrationOffsets);
-    const leanAngle = calculateLeanAngle(calibratedAccel, isPortrait, gravityAxisSign);
+    const { isPortrait, gravityAxisSign, gravityMagnitude } = getLeanOrientation(calibrationOffsets);
+    const leanAngle = calculateLeanAngle(calibratedAccel, isPortrait, gravityAxisSign, gravityMagnitude);
     const gForce = calculateGForce(calibratedAccel);
 
     // Keep refs in sync so the location callback can record the latest values
@@ -94,7 +94,7 @@ export function useRideTracking() {
     setCalibrationOffsets({
       x: currentAccel.x,
       y: currentAccel.y,
-      z: currentAccel.z - 1, // subtract 1 G from Z (gravity when upright)
+      z: currentAccel.z, // store full gravity vector for 3-D mount support
     });
 
     const { status } = await Location.requestForegroundPermissionsAsync();
