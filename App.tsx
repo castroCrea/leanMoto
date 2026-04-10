@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { initDatabase } from './src/database/database';
 import { AppErrorBoundary } from './src/components/app/AppErrorBoundary';
@@ -16,6 +17,8 @@ export default function App() {
   useEffect(() => {
     const setup = async () => {
       try {
+        // Lock to portrait by default; the dashboard button will unlock as needed.
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
         await initDatabase();
         setDbReady(true);
       } catch (err) {
