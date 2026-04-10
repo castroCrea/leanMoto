@@ -3,7 +3,7 @@ import * as Location from 'expo-location';
 import { useSensors } from './useSensors';
 import { useRideStore } from '../store/rideStore';
 import { useSettingsStore } from '../store/settingsStore';
-import { calculateLeanAngle } from '../services/leanAngleService';
+import { calculateLeanAngle, getLeanOrientation } from '../services/leanAngleService';
 import { calculateGForce, processAccelerometerData } from '../services/sensorService';
 import { distanceBetweenCoords, msToKmh } from '../utils/calculations';
 import { saveRidePoints } from '../database/database';
@@ -54,7 +54,8 @@ export function useRideTracking() {
     };
 
     const calibratedAccel = processAccelerometerData(accelerometer, calibration);
-    const leanAngle = calculateLeanAngle(calibratedAccel);
+    const { isPortrait, gravityAxisSign } = getLeanOrientation(calibrationOffsets);
+    const leanAngle = calculateLeanAngle(calibratedAccel, isPortrait, gravityAxisSign);
     const gForce = calculateGForce(calibratedAccel);
 
     // Keep refs in sync so the location callback can record the latest values
