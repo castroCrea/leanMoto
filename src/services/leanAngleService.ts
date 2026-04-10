@@ -54,8 +54,8 @@ export function calculateLeanAngle(
   if (isPortrait) {
     // Lateral axis = phone X; gravity (reference) axis = phone Y.
     // accel.x is negative when the bike leans right (the right side of the phone
-    // tilts down, so gravity pulls along –X in the phone frame), therefore we
-    // negate it so that a right lean produces a positive angle.
+    // tilts down, so gravity pulls along –X in the phone frame).  Negating it
+    // restores the convention: negative angle = left lean, positive = right lean.
     return (
       Math.atan2(-gravityAxisSign * accel.x, gravityAxisSign * accel.y + 1) *
       (180 / Math.PI)
