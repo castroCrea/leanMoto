@@ -11,7 +11,7 @@ import { useSensors } from '../hooks/useSensors';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Slider = require('@react-native-community/slider').default;
 import { useSettingsStore } from '../store/settingsStore';
-import { calculateLeanAngle } from '../services/leanAngleService';
+import { calculateLeanAngle, getLeanOrientation } from '../services/leanAngleService';
 import { processAccelerometerData } from '../services/sensorService';
 import { CalibrationData } from '../types/sensors';
 import { useI18n } from '../i18n';
@@ -33,7 +33,8 @@ export const CalibrationScreen: React.FC = () => {
   };
 
   const calibratedAccel = processAccelerometerData(accelerometer, calibration);
-  const currentLean = calculateLeanAngle(calibratedAccel);
+  const { isPortrait, gravityAxisSign } = getLeanOrientation(calibrationOffsets);
+  const currentLean = calculateLeanAngle(calibratedAccel, isPortrait, gravityAxisSign);
 
   const handleCalibrate = () => {
     setIsCalibrating(true);
