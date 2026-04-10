@@ -44,7 +44,7 @@ export const DashboardScreen: React.FC = () => {
   const { t } = useI18n();
   const { isRiding, currentMetrics, startRide, stopRide } = useRideStore();
   const { startTracking, stopTracking, isAvailable } = useRideTracking();
-  const { keepScreenOn, voiceAlertsEnabled, highLeanAngleThreshold, unitSystem } =
+  const { voiceAlertsEnabled, highLeanAngleThreshold, unitSystem } =
     useSettingsStore();
   const [isLandscape, setIsLandscape] = useState(false);
   const navigation = useNavigation();
@@ -137,7 +137,6 @@ export const DashboardScreen: React.FC = () => {
   const leanAngle = currentMetrics.leanAngle;
   const isLeft = leanAngle < -0.5;
   const isRight = leanAngle > 0.5;
-  const leanColor = isLeft ? '#E4E5E6' : isRight ? '#F38BA8' : '#8B90A7';
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
