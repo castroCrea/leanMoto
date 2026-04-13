@@ -81,6 +81,8 @@ export function useRideTracking() {
   useEffect(() => {
     recordLeanAtLowSpeedRef.current = recordLeanAtLowSpeed;
   }, [recordLeanAtLowSpeed]);
+
+  const flushPoints = useCallback(async () => {
     if (pointBuffer.current.length === 0) return;
     const toFlush = [...pointBuffer.current];
     pointBuffer.current = [];

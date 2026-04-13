@@ -315,7 +315,7 @@ export const translations = {
       sensorCalibration: 'Calibration des capteurs',
       sensorCalibrationDesc: "Calibrer la detection de l'angle",
       recording: 'ENREGISTREMENT',
-      recordLeanAtLowSpeed: 'Enregistrer les angles a basse vitesse',
+      recordLeanAtLowSpeed: 'Enregistrer les angles à basse vitesse',
       recordLeanAtLowSpeedDesc: "Enregistrer les angles en dessous de 10 km/h (ex : parking, demi-tour)",
       data: 'DONNEES',
       clearAllRideData: 'Supprimer toutes les sorties',
