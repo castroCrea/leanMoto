@@ -13,6 +13,7 @@ interface SettingsStore {
   mountAngle: number;
   calibrationOffsets: { x: number; y: number; z: number };
   theme: 'dark';
+  recordLeanAtLowSpeed: boolean;
 
   setUnitSystem: (unit: 'metric' | 'imperial') => void;
   setLanguage: (language: 'system' | 'en' | 'fr') => void;
@@ -24,6 +25,7 @@ interface SettingsStore {
   setMountAngle: (angle: number) => void;
   setCalibrationOffsets: (offsets: { x: number; y: number; z: number }) => void;
   resetCalibration: () => void;
+  setRecordLeanAtLowSpeed: (enabled: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -39,6 +41,7 @@ export const useSettingsStore = create<SettingsStore>()(
       mountAngle: 0,
       calibrationOffsets: { x: 0, y: 0, z: 0 },
       theme: 'dark',
+      recordLeanAtLowSpeed: false,
 
       setUnitSystem: (unit) => set({ unitSystem: unit }),
       setLanguage: (language) => set({ language }),
@@ -50,6 +53,7 @@ export const useSettingsStore = create<SettingsStore>()(
       setMountAngle: (angle) => set({ mountAngle: angle }),
       setCalibrationOffsets: (offsets) => set({ calibrationOffsets: offsets }),
       resetCalibration: () => set({ calibrationOffsets: { x: 0, y: 0, z: 0 }, mountAngle: 0 }),
+      setRecordLeanAtLowSpeed: (enabled) => set({ recordLeanAtLowSpeed: enabled }),
     }),
     {
       name: 'leanride-settings',

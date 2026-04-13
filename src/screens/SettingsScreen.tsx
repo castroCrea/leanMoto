@@ -32,12 +32,14 @@ export const SettingsScreen: React.FC = () => {
     highLeanAngleThreshold,
     keepScreenOn,
     hudMode,
+    recordLeanAtLowSpeed,
     setUnitSystem,
     setLanguage,
     setVoiceAlertsEnabled,
     setHighLeanAngleThreshold,
     setKeepScreenOn,
     setHudMode,
+    setRecordLeanAtLowSpeed,
   } = useSettingsStore();
 
   const handleClearAllData = () => {
@@ -223,6 +225,25 @@ export const SettingsScreen: React.FC = () => {
                 onValueChange={setHudMode}
                 trackColor={{ false: '#353B4D', true: '#E4E5E633' }}
                 thumbColor={hudMode ? '#E4E5E6' : '#8B90A7'}
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* Recording */}
+        <View style={styles.section}>
+          <Text style={styles.sectionHeader}>{t('settings.recording')}</Text>
+          <View style={styles.card}>
+            <View style={styles.settingRow}>
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingLabel}>{t('settings.recordLeanAtLowSpeed')}</Text>
+                <Text style={styles.settingDesc}>{t('settings.recordLeanAtLowSpeedDesc')}</Text>
+              </View>
+              <Switch
+                value={recordLeanAtLowSpeed}
+                onValueChange={setRecordLeanAtLowSpeed}
+                trackColor={{ false: '#353B4D', true: '#E4E5E633' }}
+                thumbColor={recordLeanAtLowSpeed ? '#E4E5E6' : '#8B90A7'}
               />
             </View>
           </View>

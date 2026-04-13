@@ -16,7 +16,7 @@ export function useRideTracking() {
   const [isTracking, setIsTracking] = useState(false);
   const { accelerometer, gyroscope, isAvailable } = useSensors();
   const { isRiding, currentRide, updateMetrics } = useRideStore();
-  const { mountAngle, calibrationOffsets, setCalibrationOffsets } = useSettingsStore();
+  const { mountAngle, calibrationOffsets, setCalibrationOffsets, recordLeanAtLowSpeed } = useSettingsStore();
 
   const locationSubscription = useRef<Location.LocationSubscription | null>(null);
   const lastCoords = useRef<{ lat: number; lon: number } | null>(null);
@@ -75,6 +75,12 @@ export function useRideTracking() {
       gForceZ: calibratedAccel.z,
     });
   }, [accelerometer, isTracking, calibrationOffsets, mountAngle, updateMetrics]);
+
+  // Ref to avoid stale closure for recordLeanAtLowSpeed inside the location callback.
+  const recordLeanAtLowSpeedRef = useRef(recordLeanAtLowSpeed);
+  useEffect(() => {
+    recordLeanAtLowSpeedRef.current = recordLeanAtLowSpeed;
+  }, [recordLeanAtLowSpeed]);
 
   const flushPoints = useCallback(async () => {
     if (pointBuffer.current.length === 0) return;
@@ -142,13 +148,16 @@ export function useRideTracking() {
         });
 
         if (isRiding && currentRide?.id) {
+          const LOW_SPEED_THRESHOLD_KMH = 10;
+          const recordLean =
+            recordLeanAtLowSpeedRef.current || speedKmh >= LOW_SPEED_THRESHOLD_KMH;
           const point: RidePoint = {
             rideId: currentRide.id,
             timestamp: Date.now(),
             latitude,
             longitude,
             speed: speedKmh,
-            leanAngle: leanAngleRef.current,
+            leanAngle: recordLean ? leanAngleRef.current : 0,
             acceleration: gForceRef.current,
             gForceX: calibratedAccelRef.current.x,
             gForceY: calibratedAccelRef.current.y,
